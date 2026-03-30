@@ -1250,8 +1250,8 @@ body {
 
 /* Sidebar Logo */
 .sidebar-logo-img {
-  width: 24px;
-  height: 24px;
+  max-height: 38px;
+  width: auto;
   object-fit: contain;
   filter: brightness(0) invert(1) drop-shadow(0 0 5px rgba(255, 255, 255, 0.4));
   transition: all 0.3s;
@@ -1259,6 +1259,9 @@ body {
 .sidebar-logo-img:hover {
   filter: brightness(0) invert(1) drop-shadow(0 0 10px var(--cyan));
 }
+
+.view-hidden { display: none !important; }
+.view-active { display: block !important; }
 
 /* Common Inputs */
 .todo-input-group, .kanban-input-group, .yks-controls, .links-input-group {

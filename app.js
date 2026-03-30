@@ -762,14 +762,24 @@ function switchView(viewName) {
   
   views.forEach(v => {
     // Buttons
-    const btn = DOM["btnShow" + v.charAt(0).toUpperCase() + v.slice(1)];
+    const btnId = "btnShow" + v.charAt(0).toUpperCase() + v.slice(1);
+    const btn = DOM[btnId];
     if(btn) btn.classList.toggle("active", viewName === v);
     
-    // View Containers
-    const container = DOM[v + "View"];
+    // View Containers (Singular mapping fix for 'pages' -> 'pageView')
+    const containerId = (v === "pages" ? "page" : v) + "View";
+    const container = DOM[containerId];
+    
     if(container) {
-      container.classList.toggle("view-hidden", viewName !== v);
-      container.classList.toggle("view-active", viewName === v);
+      if (viewName === v) {
+        container.style.display = "block";
+        container.classList.add("view-active");
+        container.classList.remove("view-hidden");
+      } else {
+        container.style.display = "none";
+        container.classList.add("view-hidden");
+        container.classList.remove("view-active");
+      }
     }
   });
   
