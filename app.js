@@ -40,6 +40,7 @@ let routinesData = {
 // --- SECOND BRAIN DATA ---
 const LS_TODO = "kerotion_todo";
 const LS_KANBAN = "kerotion_kanban";
+const LS_YKS = "kerotion_yks";
 const LS_YKS_MISTAKES = "kerotion_yks_mistakes";
 const LS_YKS_SYLLABUS = "kerotion_yks_syllabus";
 const LS_LINKS = "kerotion_links";
@@ -96,6 +97,7 @@ function loadData() {
   const ymData = localStorage.getItem(LS_YKS_MISTAKES);
   if (ymData) yksMistakesData = JSON.parse(ymData);
 
+  const ysData = localStorage.getItem(LS_YKS_SYLLABUS);
   if (ysData) yksProgress = JSON.parse(ysData);
 
   const pmLogData = localStorage.getItem("kerotion_pomo_log");
@@ -133,67 +135,55 @@ function getActivePage() {
 
 /* ---------- 2. DOM ELEMENTS ---------- */
 const DOM = {
-  sidebarToggle: document.getElementById("sidebarToggle"),
-  sidebarOpenBtn: document.getElementById("sidebarOpenBtn"),
-  sidebar: document.getElementById("sidebar"),
-  btnAddRootPage: document.getElementById("btnAddRootPage"),
-  pageTree: document.getElementById("pageTree"),
-  pageTitle: document.getElementById("pageTitle"),
-  blocksContainer: document.getElementById("blocksContainer"),
-  slashMenu: document.getElementById("slashMenu"),
-  slashMenuList: document.getElementById("slashMenuList"),
-  
-  // YENI DOM ELEMENTLERI
-  pageView: document.getElementById("pageView"),
-  journalView: document.getElementById("journalView"),
-  routinesView: document.getElementById("routinesView"),
-  btnShowPages: document.getElementById("btnShowPages"),
-  btnShowJournal: document.getElementById("btnShowJournal"),
-  btnShowRoutines: document.getElementById("btnShowRoutines"),
-  
-  // SECOND BRAIN VIEWS & MENUS
-  inboxView: document.getElementById("inboxView"),
-  todoView: document.getElementById("todoView"),
-  kanbanView: document.getElementById("kanbanView"),
-  yksView: document.getElementById("yksView"),
-  linksView: document.getElementById("linksView"),
-
-  btnShowInbox: document.getElementById("btnShowInbox"),
-  btnShowTodo: document.getElementById("btnShowTodo"),
-  btnShowKanban: document.getElementById("btnShowKanban"),
-  btnShowYks: document.getElementById("btnShowYks"),
-  btnShowLinks: document.getElementById("btnShowLinks"),
-  
-  // YKS TABS & ELEMENTS
-  yksTabBtns: document.querySelectorAll(".yks-tab-btn"),
-  yksTabContents: document.querySelectorAll(".yks-tab-content"),
-  btnMistakeAdd: document.getElementById("btnMistakeAdd"),
-  mistakeList: document.getElementById("mistakeList"),
-  syllabusGrid: document.getElementById("syllabusGrid"),
-  
-  // POMODORO DOM
-  pomoZoneBtn: document.getElementById("btnPomoZone"),
-  pomoTimeDisplay: document.getElementById("pomoTimeDisplay"),
-  pomoStatusText: document.getElementById("pomoStatusText"),
-  pomoModes: document.querySelectorAll(".pomo-mode"),
-  pomoCustomWork: document.getElementById("pomoCustomWork"),
-  pomoCustomBreak: document.getElementById("pomoCustomBreak"),
-  pomoApplyCustom: document.getElementById("btnPomoApplyCustom"),
-  pomoPlayPause: document.getElementById("pomoPlayPause"),
-  pomoReset: document.getElementById("pomoReset"),
-  
-  // THE ZONE
-  theZone: document.getElementById("theZone"),
-  btnZoneExit: document.getElementById("btnZoneExit"),
-  zoneStatusText: document.getElementById("zoneStatusText"),
-  zoneTimerDisplay: document.getElementById("zoneTimerDisplay"),
-  zoneCycleDisplay: document.getElementById("zoneCycleDisplay"),
-  
-  // CONTEXT MENU
-  blockContextMenu: document.getElementById("blockContextMenu"),
-  btnDeleteBlock: document.getElementById("btnDeleteBlock"),
-  contextColors: document.querySelectorAll(".color-badge")
+  contextColors: [] // Will be populated in init
 };
+
+function refreshDOM() {
+  DOM.sidebarToggle = document.getElementById("sidebarToggle");
+  DOM.sidebarOpenBtn = document.getElementById("sidebarOpenBtn");
+  DOM.sidebar = document.getElementById("sidebar");
+  DOM.btnAddRootPage = document.getElementById("btnAddRootPage");
+  DOM.pageTree = document.getElementById("pageTree");
+  DOM.pageTitle = document.getElementById("pageTitle");
+  DOM.blocksContainer = document.getElementById("blocksContainer");
+  DOM.slashMenu = document.getElementById("slashMenu");
+  DOM.slashMenuList = document.getElementById("slashMenuList");
+  DOM.pageView = document.getElementById("pageView");
+  DOM.journalView = document.getElementById("journalView");
+  DOM.routinesView = document.getElementById("routinesView");
+  DOM.btnShowPages = document.getElementById("btnShowPages");
+  DOM.btnShowJournal = document.getElementById("btnShowJournal");
+  DOM.btnShowRoutines = document.getElementById("btnShowRoutines");
+  DOM.inboxView = document.getElementById("inboxView");
+  DOM.todoView = document.getElementById("todoView");
+  DOM.kanbanView = document.getElementById("kanbanView");
+  DOM.yksView = document.getElementById("yksView");
+  DOM.linksView = document.getElementById("linksView");
+  DOM.btnShowInbox = document.getElementById("btnShowInbox");
+  DOM.btnShowTodo = document.getElementById("btnShowTodo");
+  DOM.btnShowKanban = document.getElementById("btnShowKanban");
+  DOM.btnShowYks = document.getElementById("btnShowYks");
+  DOM.btnShowLinks = document.getElementById("btnShowLinks");
+  DOM.yksTabBtns = document.querySelectorAll(".yks-tab-btn");
+  DOM.yksTabContents = document.querySelectorAll(".yks-tab-content");
+  DOM.btnMistakeAdd = document.getElementById("btnMistakeAdd");
+  DOM.mistakeList = document.getElementById("mistakeList");
+  DOM.syllabusGrid = document.getElementById("syllabusGrid");
+  DOM.pomoZoneBtn = document.getElementById("btnPomoZone");
+  DOM.pomoTimeDisplay = document.getElementById("pomoTimeDisplay");
+  DOM.pomoStatusText = document.getElementById("pomoStatusText");
+  DOM.pomoModes = document.querySelectorAll(".pomo-mode");
+  DOM.pomoCustomWork = document.getElementById("pomoCustomWork");
+  DOM.pomoCustomBreak = document.getElementById("pomoCustomBreak");
+  DOM.pomoApplyCustom = document.getElementById("btnPomoApplyCustom");
+  DOM.pomoPlayPause = document.getElementById("pomoPlayPause");
+  DOM.pomoReset = document.getElementById("pomoReset");
+  DOM.theZone = document.getElementById("theZone");
+  DOM.btnZoneExit = document.getElementById("btnZoneExit");
+  DOM.blockContextMenu = document.getElementById("blockContextMenu");
+  DOM.btnDeleteBlock = document.getElementById("btnDeleteBlock");
+  DOM.contextColors = document.querySelectorAll(".color-badge");
+}
 
 let slashMenuState = {
   active: false,
@@ -310,26 +300,6 @@ function openPage(pageId) {
   }
 }
 
-DOMAIN_TITLE_EVENTS: {
-  DOM.pageTitle.addEventListener("input", () => {
-    const page = getActivePage();
-    if (page) {
-      page.title = DOM.pageTitle.value;
-      autoResize(DOM.pageTitle);
-      scheduleSave();
-      renderTree(); // Update title in sidebar live
-    }
-  });
-  DOM.pageTitle.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      const page = getActivePage();
-      if (page && page.blocks.length > 0) {
-        focusBlock(page.blocks[0].id);
-      }
-    }
-  });
-}
 
 /* ---------- 4. BLOK MİMARİSİ ---------- */
 function renderBlocks() {
@@ -675,15 +645,6 @@ function applySlashMenuSelection() {
   closeSlashMenu();
 }
 
-DOM.slashMenuList.addEventListener("click", (e) => {
-  const li = e.target.closest(".slash-menu-item");
-  if (!li) return;
-  const newType = li.dataset.type;
-  if (slashMenuState.blockId) {
-    changeBlockType(slashMenuState.blockId, newType);
-  }
-  closeSlashMenu();
-});
 
 /* ---------- 6. UTILS & INIT ---------- */
 function autoResize(el) {
@@ -692,19 +653,54 @@ function autoResize(el) {
 }
 
 function attachGlobalListeners() {
-  DOM.sidebarToggle.addEventListener("click", toggleSidebar);
-  DOM.sidebarOpenBtn.addEventListener("click", toggleSidebar);
-  DOM.btnAddRootPage.addEventListener("click", () => createPage(null));
+  if (DOM.sidebarToggle) DOM.sidebarToggle.addEventListener("click", toggleSidebar);
+  if (DOM.sidebarOpenBtn) DOM.sidebarOpenBtn.addEventListener("click", toggleSidebar);
+  if (DOM.btnAddRootPage) DOM.btnAddRootPage.addEventListener("click", () => createPage(null));
+  
+  // TITLE EVENTS
+  if (DOM.pageTitle) {
+    DOM.pageTitle.addEventListener("input", () => {
+      const page = getActivePage();
+      if (page) {
+        page.title = DOM.pageTitle.value;
+        autoResize(DOM.pageTitle);
+        scheduleSave();
+        renderTree();
+      }
+    });
+    DOM.pageTitle.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const page = getActivePage();
+        if (page && page.blocks.length > 0) {
+          focusBlock(page.blocks[0].id);
+        }
+      }
+    });
+  }
+
+  // SLASH MENU EVENTS
+  if (DOM.slashMenuList) {
+    DOM.slashMenuList.addEventListener("click", (e) => {
+      const li = e.target.closest(".slash-menu-item");
+      if (!li) return;
+      const newType = li.dataset.type;
+      if (slashMenuState.blockId) {
+        changeBlockType(slashMenuState.blockId, newType);
+      }
+      closeSlashMenu();
+    });
+  }
   
   // MENU EVENTS
-  DOM.btnShowPages.addEventListener("click", () => switchView("pages"));
-  DOM.btnShowJournal.addEventListener("click", () => switchView("journal"));
-  DOM.btnShowRoutines.addEventListener("click", () => switchView("routines"));
-  DOM.btnShowInbox.addEventListener("click", () => switchView("inbox"));
-  DOM.btnShowTodo.addEventListener("click", () => switchView("todo"));
-  DOM.btnShowKanban.addEventListener("click", () => switchView("kanban"));
-  DOM.btnShowYks.addEventListener("click", () => switchView("yks"));
-  DOM.btnShowLinks.addEventListener("click", () => switchView("links"));
+  if (DOM.btnShowPages) DOM.btnShowPages.addEventListener("click", () => switchView("pages"));
+  if (DOM.btnShowJournal) DOM.btnShowJournal.addEventListener("click", () => switchView("journal"));
+  if (DOM.btnShowRoutines) DOM.btnShowRoutines.addEventListener("click", () => switchView("routines"));
+  if (DOM.btnShowInbox) DOM.btnShowInbox.addEventListener("click", () => switchView("inbox"));
+  if (DOM.btnShowTodo) DOM.btnShowTodo.addEventListener("click", () => switchView("todo"));
+  if (DOM.btnShowKanban) DOM.btnShowKanban.addEventListener("click", () => switchView("kanban"));
+  if (DOM.btnShowYks) DOM.btnShowYks.addEventListener("click", () => switchView("yks"));
+  if (DOM.btnShowLinks) DOM.btnShowLinks.addEventListener("click", () => switchView("links"));
   
   // YKS TAB EVENTS
   DOM.yksTabBtns.forEach(btn => {
@@ -741,8 +737,8 @@ function attachGlobalListeners() {
   });
   
   // THE ZONE EVENTS
-  DOM.pomoZoneBtn.addEventListener("click", toggleZone);
-  DOM.btnZoneExit.addEventListener("click", toggleZone);
+  if (DOM.pomoZoneBtn) DOM.pomoZoneBtn.addEventListener("click", toggleZone);
+  if (DOM.btnZoneExit) DOM.btnZoneExit.addEventListener("click", toggleZone);
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape" && !DOM.theZone.classList.contains("zone-hidden")) {
       toggleZone();
@@ -769,58 +765,106 @@ function attachGlobalListeners() {
       }
     });
   });
+
+  // YKS & LINK ADD EVENTS (Restored and moved inside listeners for safety)
+  document.getElementById("btnYksAdd").addEventListener("click", () => {
+    const n = document.getElementById("yksNameInput").value.trim();
+    const v = parseFloat(document.getElementById("yksNetInput").value);
+    if (n && !isNaN(v)) {
+      yksData.push({ name: n, net: v });
+      document.getElementById("yksNameInput").value = "";
+      document.getElementById("yksNetInput").value = "";
+      scheduleSave();
+      renderYksBar();
+    }
+  });
+
+  document.getElementById("btnLinkAdd").addEventListener("click", () => {
+    const title = document.getElementById("linkTitleInput").value.trim();
+    const urlEl = document.getElementById("linkUrlInput");
+    let url = urlEl.value.trim();
+    if (title && url) {
+      if(!url.startsWith("http")) url = "https://" + url;
+      linksData.push({ title, url });
+      document.getElementById("linkTitleInput").value = "";
+      urlEl.value = "";
+      scheduleSave();
+      renderLinks();
+    }
+  });
 }
 
 function init() {
-  loadData();
-  attachGlobalListeners();
-  renderTree();
-  if (activePageId) {
-    openPage(activePageId);
+  try {
+    console.log("Initializing Kerotion...");
+    refreshDOM();
+    loadData();
+    attachGlobalListeners();
+    renderTree();
+    if (activePageId) {
+      openPage(activePageId);
+    }
+    console.log("Kerotion initialized successfully.");
+  } catch (err) {
+    console.error("CRITICAL: Kerotion initialization failed:", err);
   }
 }
 
 /* ---------- 7. VIEW NAVIGATION ---------- */
 function switchView(viewName) {
+  console.log("Switching view to:", viewName);
   currentView = viewName;
   
-  const views = ["pages", "journal", "routines", "inbox", "todo", "kanban", "yks", "fitness", "links"];
-  
-  views.forEach(v => {
-    // Buttons
-    const btnId = "btnShow" + v.charAt(0).toUpperCase() + v.slice(1);
-    const btn = DOM[btnId];
-    if(btn) btn.classList.toggle("active", viewName === v);
+  const viewMap = {
+    "pages": "pageView",
+    "journal": "journalView",
+    "routines": "routinesView",
+    "inbox": "inboxView",
+    "todo": "todoView",
+    "kanban": "kanbanView",
+    "yks": "yksView",
+    "links": "linksView"
+  };
+
+  const btnMap = {
+    "pages": "btnShowPages",
+    "journal": "btnShowJournal",
+    "routines": "btnShowRoutines",
+    "inbox": "btnShowInbox",
+    "todo": "btnShowTodo",
+    "kanban": "btnShowKanban",
+    "yks": "btnShowYks",
+    "links": "btnShowLinks"
+  };
+
+  Object.keys(viewMap).forEach(v => {
+    const btn = DOM[btnMap[v]];
+    const container = DOM[viewMap[v]];
     
-    // View Containers (Singular mapping fix for 'pages' -> 'pageView')
-    const containerId = (v === "pages" ? "page" : v) + "View";
-    const container = DOM[containerId];
-    
-    if(container) {
+    if (btn) btn.classList.toggle("active", viewName === v);
+    if (container) {
       if (viewName === v) {
-        container.style.display = "block";
-        container.classList.add("view-active");
         container.classList.remove("view-hidden");
+        container.style.display = "block";
       } else {
-        container.style.display = "none";
         container.classList.add("view-hidden");
-        container.classList.remove("view-active");
+        container.style.display = "none";
       }
     }
   });
-  
+
   // Render Specific Views
-  if (viewName === "journal") renderJournalList();
-  if (viewName === "routines") renderRoutinesGrid();
-  if (viewName === "inbox") renderInbox();
-  if (viewName === "todo") renderTodo();
-  if (viewName === "kanban") renderKanban();
   if (viewName === "yks") {
     renderYksBar();
-    renderMistakeVault();
+    renderMistakes();
     renderSyllabusTracker();
   }
   if (viewName === "links") renderLinks();
+  if (viewName === "routines") renderRoutines();
+  if (viewName === "journal") renderJournalList();
+  if (viewName === "inbox") renderInbox();
+  if (viewName === "todo") renderTodo();
+  if (viewName === "kanban") renderKanban();
 }
 
 /* ---------- 8. JOURNAL MODULE ---------- */
@@ -1490,42 +1534,314 @@ function renderSyllabusTracker() {
 window.toggleTopic = function(lesson, topic) {
   if (!yksProgress[lesson]) yksProgress[lesson] = [];
   const idx = yksProgress[lesson].indexOf(topic);
-  if (idx > -1) {
-    yksProgress[lesson].splice(idx, 1);
-  } else {
-    yksProgress[lesson].push(topic);
+  if (idx > -1) yksProgress[lesson].splice(idx, 1);
+  else yksProgress[lesson].push(topic);
+  scheduleSave();
+  renderSyllabusTracker();
+};
+/* ---------- 8. YKS LOGIC ---------- */
+function switchYksTab(tabName) {
+  DOM.yksTabBtns.forEach(btn => btn.classList.toggle("active", btn.dataset.tab === tabName));
+  DOM.yksTabContents.forEach(content => {
+    const isTarget = content.id === "yksTab" + tabName.charAt(0).toUpperCase() + tabName.slice(1);
+    content.classList.toggle("view-hidden", !isTarget);
+  });
+  if(tabName === "analiz") renderYksBar();
+  if(tabName === "syllabus") renderSyllabusTracker();
+  if(tabName === "mistakes") renderMistakes();
+}
+
+function renderYksBar() {
+  const area = document.getElementById("yksChartArea");
+  if(!area) return;
+  area.innerHTML = "";
+  if(yksData.length === 0) {
+    area.innerHTML = "<p style='color:var(--text-muted);'>Deneme verisi yok.</p>";
+    return;
   }
+  yksData.forEach(d => {
+    const barWrap = document.createElement("div");
+    barWrap.className = "yks-bar-wrap";
+    barWrap.innerHTML = `
+      <div class="yks-bar" style="height: ${Math.min(d.net, 120)}px" title="${d.name}: ${d.net}"></div>
+      <span class="yks-bar-label">${d.name}</span>
+    `;
+    area.appendChild(barWrap);
+  });
+}
+
+function addMistakeLog() {
+  const lesson = document.getElementById("mistakeLesson").value.trim();
+  const subject = document.getElementById("mistakeSubject").value.trim();
+  const reason = document.getElementById("mistakeReason").value;
+  const note = document.getElementById("mistakeNote").value.trim();
+  
+  if(lesson && subject) {
+    yksMistakesData.unshift({
+      id: generateId(),
+      lesson,
+      subject,
+      reason,
+      note,
+      date: getTodayDateStr()
+    });
+    document.getElementById("mistakeLesson").value = "";
+    document.getElementById("mistakeSubject").value = "";
+    document.getElementById("mistakeNote").value = "";
+    scheduleSave();
+    renderMistakes();
+  }
+}
+
+function renderMistakes() {
+  const list = document.getElementById("mistakeList");
+  if(!list) return;
+  list.innerHTML = "";
+  if(yksMistakesData.length === 0) {
+    list.innerHTML = "<tr><td colspan='5' style='text-align:center; color:var(--text-muted);'>Kayıt yok.</td></tr>";
+    return;
+  }
+  yksMistakesData.forEach((m, idx) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${m.date}</td>
+      <td>${m.lesson}</td>
+      <td>${m.subject}</td>
+      <td><span class="mistake-tag tag-${m.reason.toLowerCase()}">${m.reason}</span></td>
+      <td><button class="todo-trash" onclick="window.deleteMistake(${idx})">🗑</button></td>
+    `;
+    list.appendChild(tr);
+  });
+}
+
+window.deleteMistake = function(idx) {
+  yksMistakesData.splice(idx, 1);
+  scheduleSave();
+  renderMistakes();
+};
+
+function renderSyllabusTracker() {
+  const grid = document.getElementById("syllabusGrid");
+  if(!grid) return;
+  grid.innerHTML = "";
+  
+  const subjects = {
+    "TYT Matematik": ["Sayılar", "Problemler", "Geometri"],
+    "TYT Türkçe": ["Paragraf", "Dil Bilgisi", "Yazım Kuralları"],
+    "AYT Matematik": ["Limit", "Türev", "İntegral", "Logaritma"]
+  };
+
+  Object.keys(subjects).forEach(lesson => {
+    const topics = subjects[lesson];
+    const finished = yksProgress[lesson] || [];
+    const percent = topics.length > 0 ? Math.round((finished.length / topics.length) * 100) : 0;
+    
+    const card = document.createElement("div");
+    card.className = "syllabus-card";
+    card.innerHTML = `
+      <div class="syllabus-header">
+        <span class="syllabus-lesson-name">${lesson}</span>
+        <span class="syllabus-percentage">%${percent}</span>
+      </div>
+      <div class="progress-container">
+        <div class="progress-bar-fill" style="width: ${percent}%"></div>
+      </div>
+      <div class="syllabus-topics">
+        ${topics.map(t => {
+          const isDone = finished.includes(t);
+          return `
+            <label class="topic-item ${isDone ? 'done' : ''}">
+              <input type="checkbox" ${isDone ? 'checked' : ''} onchange="window.toggleTopic('${lesson}', '${t}')" />
+              <span>${t}</span>
+            </label>
+          `;
+        }).join('')}
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+window.toggleTopic = function(lesson, topic) {
+  if(!yksProgress[lesson]) yksProgress[lesson] = [];
+  const idx = yksProgress[lesson].indexOf(topic);
+  if(idx > -1) yksProgress[lesson].splice(idx, 1);
+  else yksProgress[lesson].push(topic);
   scheduleSave();
   renderSyllabusTracker();
 };
 
-document.getElementById("btnYksAdd").addEventListener("click", () => {
-  const n = document.getElementById("yksNameInput").value.trim();
-  const v = parseFloat(document.getElementById("yksNetInput").value);
-  if (n && !isNaN(v)) {
-    yksData.push({ name: n, net: v });
-    document.getElementById("yksNameInput").value = "";
-    document.getElementById("yksNetInput").value = "";
-    scheduleSave();
-    renderYksBar();
-  }
-});
+/* ---------- 9. JOURNAL LOGIC ---------- */
+function renderJournalList() {
+  document.getElementById("journalList").classList.remove("view-hidden");
+  document.getElementById("journalEditor").classList.add("view-hidden");
+  const grid = document.getElementById("journalGrid");
+  grid.innerHTML = "";
+  
+  const sorted = Object.keys(journalData).sort().reverse();
+  sorted.forEach(date => {
+    const card = document.createElement("div");
+    card.className = "journal-card";
+    card.innerHTML = `<h3>${date}</h3><p>${journalData[date].substring(0, 50)}...</p>`;
+    card.onclick = () => openJournalEditor(date);
+    grid.appendChild(card);
+  });
+}
 
-// --- 12.6 LINK VAULT ---
+function openJournalEditor(date) {
+  activeJournalDate = date;
+  document.getElementById("journalList").classList.add("view-hidden");
+  document.getElementById("journalEditor").classList.remove("view-hidden");
+  document.getElementById("journalDateTitle").innerText = date;
+  document.getElementById("journalTextarea").value = journalData[date] || "";
+}
+
+function saveJournalEntry() {
+  if(!activeJournalDate) return;
+  journalData[activeJournalDate] = document.getElementById("journalTextarea").value;
+  scheduleSave();
+  renderJournalList();
+}
+
+/* ---------- 10. ROUTINES & POMO ---------- */
+function addRoutine() {
+  const input = document.getElementById("newRoutineInput");
+  const val = input.value.trim();
+  if(val) {
+    routinesData.push({ id: generateId(), text: val, completed: false });
+    input.value = "";
+    scheduleSave();
+    renderRoutines();
+  }
+}
+
+function renderRoutines() {
+  const list = document.getElementById("routinesList");
+  if(!list) return;
+  list.innerHTML = "";
+  routinesData.forEach(r => {
+    const item = document.createElement("div");
+    item.className = "routine-item" + (r.completed ? " completed" : "");
+    item.innerHTML = `
+      <input type="checkbox" ${r.completed ? "checked" : ""} onchange="window.toggleRoutine('${r.id}')" />
+      <span>${r.text}</span>
+      <button class="todo-trash" onclick="window.deleteRoutine('${r.id}')">🗑</button>
+    `;
+    list.appendChild(item);
+  });
+}
+
+window.toggleRoutine = function(id) {
+  const r = routinesData.find(x => x.id === id);
+  if(r) r.completed = !r.completed;
+  scheduleSave();
+  renderRoutines();
+};
+
+window.deleteRoutine = function(id) {
+  routinesData = routinesData.filter(x => x.id !== id);
+  scheduleSave();
+  renderRoutines();
+};
+
+function togglePomoTimer() {
+  if(pomoIsRunning) {
+    clearInterval(pomoInterval);
+    pomoIsRunning = false;
+    DOM.pomoPlayPause.innerText = "▶";
+  } else {
+    pomoIsRunning = true;
+    DOM.pomoPlayPause.innerText = "⏸";
+    pomoInterval = setInterval(pomoTick, 1000);
+  }
+}
+
+function resetPomoTimer() {
+  clearInterval(pomoInterval);
+  pomoIsRunning = false;
+  pomoTimeLeft = 25 * 60;
+  pomoState = "idle";
+  updatePomoUI();
+  DOM.pomoPlayPause.innerText = "▶";
+}
+
+function setPomoMode(work, rest) {
+  clearInterval(pomoInterval);
+  pomoIsRunning = false;
+  pomoTimeLeft = work * 60;
+  pomoState = "work";
+  updatePomoUI();
+  DOM.pomoPlayPause.innerText = "▶";
+}
+
+function pomoTick() {
+  if(pomoTimeLeft > 0) {
+    pomoTimeLeft--;
+    updatePomoUI();
+  } else {
+    endPomodoro();
+  }
+}
+
+function updatePomoUI() {
+  const m = Math.floor(pomoTimeLeft / 60);
+  const s = pomoTimeLeft % 60;
+  const timeStr = `${m}:${s < 10 ? '0' : ''}${s}`;
+  DOM.pomoTimeDisplay.innerText = timeStr;
+  document.title = `${timeStr} - Kerotion`;
+  
+  if(DOM.zoneTimerDisplay) DOM.zoneTimerDisplay.innerText = timeStr;
+  
+  let status = "Bekliyor";
+  if(pomoState === "work") status = "ÇALIŞMA 🔥";
+  else if(pomoState === "break") status = "MOLA ☕";
+  DOM.pomoStatusText.innerText = status;
+}
+
+function endPomodoro() {
+  clearInterval(pomoInterval);
+  pomoIsRunning = false;
+  DOM.pomoPlayPause.innerText = "▶";
+  
+  const target = document.getElementById("pomoFocusTarget").value;
+  pomoLog.unshift({ id: generateId(), target, date: new Date().toLocaleString() });
+  scheduleSave();
+
+  if(pomoState === "work") {
+    pomoState = "break";
+    pomoTimeLeft = 5 * 60;
+    alert("Pomodoro bitti! Mola vakti.");
+  } else {
+    pomoState = "work";
+    pomoTimeLeft = 25 * 60;
+    alert("Mola bitti! Odaklanma vakti.");
+  }
+  updatePomoUI();
+}
+
+function toggleZone() {
+  DOM.theZone.classList.toggle("zone-hidden");
+  if(!DOM.theZone.classList.contains("zone-hidden")) {
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "auto";
+  }
+}
+
+// --- 12.6 LINK VAULT (Restored) ---
 function renderLinks() {
   const grid = document.getElementById("linksGrid");
+  if (!grid) return;
   grid.innerHTML = "";
   if(linksData.length === 0) {
     grid.innerHTML = "<p style='color:var(--text-muted);'>Kasa boş.</p>";
     return;
   }
-  
   linksData.forEach((link, idx) => {
     const card = document.createElement("a");
     card.className = "link-card";
     card.href = link.url;
     card.target = "_blank";
-    
     card.innerHTML = `
       <div style="display:flex; justify-content:space-between;">
         <span class="link-title">${link.title}</span>
@@ -1542,21 +1858,6 @@ window.deleteLink = function(idx) {
   scheduleSave();
   renderLinks();
 };
-
-document.getElementById("btnLinkAdd").addEventListener("click", () => {
-  const title = document.getElementById("linkTitleInput").value.trim();
-  const urlEl = document.getElementById("linkUrlInput");
-  let url = urlEl.value.trim();
-  
-  if (title && url) {
-    if(!url.startsWith("http")) url = "https://" + url;
-    linksData.push({ title, url });
-    document.getElementById("linkTitleInput").value = "";
-    urlEl.value = "";
-    scheduleSave();
-    renderLinks();
-  }
-});
 
 document.addEventListener("DOMContentLoaded", init);
 
