@@ -44,15 +44,34 @@
     <!-- YENİ: POMODORO SAYAÇ -->
     <div class="sidebar-pomodoro" id="pomodoroContainer">
       <div class="pomo-header">
-        <span>⏱️ Odak Sayacı</span>
+        <span>⏱️ Odak Merkezi</span>
+        <button id="btnPomoZone" class="pomo-zone-btn" title="Tam Ekran Modu (The Zone)">⛶</button>
       </div>
       <div class="pomo-display" id="pomoTimeDisplay">25:00</div>
+      <div class="pomo-status" id="pomoStatusText">Durum: Bekliyor (Seans: 0)</div>
       
+      <!-- Şablonlar -->
       <div class="pomo-modes">
-        <button class="pomo-mode active" data-time="25">25</button>
-        <button class="pomo-mode" data-time="50">50</button>
-        <button class="pomo-mode" data-time="60">60</button>
+        <button class="pomo-mode active" data-w="25" data-b="5" title="Derin Çalışma (25/5)">25/5</button>
+        <button class="pomo-mode" data-w="90" data-b="15" title="Maraton (90/15)">90/15</button>
+        <button class="pomo-mode" data-w="135" data-b="15" title="YKS (135/15)">135/15</button>
       </div>
+
+      <!-- Akordiyon Serbest Süre Girişi -->
+      <details class="pomo-custom-details">
+        <summary class="pomo-custom-summary">Özel Süre Gir</summary>
+        <div class="pomo-custom-inputs">
+          <div class="pomo-custom-col">
+            <label>Çalışma (dk)</label>
+            <input type="number" id="pomoCustomWork" value="25" min="1" max="300" />
+          </div>
+          <div class="pomo-custom-col">
+            <label>Mola (dk)</label>
+            <input type="number" id="pomoCustomBreak" value="5" min="1" max="60" />
+          </div>
+          <button id="btnPomoApplyCustom" class="btn-glow-small">Uygula</button>
+        </div>
+      </details>
 
       <div class="pomo-controls">
         <button class="pomo-btn play" id="pomoPlayPause" title="Başlat/Duraklat">▶</button>
@@ -149,8 +168,27 @@
     </ul>
   </div>
 
+  <!-- ========== THE ZONE (TAM EKRAN ODAK) ========== -->
+  <div class="the-zone zone-hidden" id="theZone">
+    <button class="btn-zone-exit" id="btnZoneExit">Çıkış Sistemi (ESC)</button>
+    <div class="zone-content">
+      <h2 class="zone-status" id="zoneStatusText">ÇALIŞMA</h2>
+      <div class="zone-timer" id="zoneTimerDisplay">25:00</div>
+      <div class="zone-cycle" id="zoneCycleDisplay">Seans: 0</div>
+    </div>
+  </div>
+
   <!-- ========== BLOCK CONTEXT MENU ========== -->
   <div class="block-context-menu" id="blockContextMenu" style="display: none;">
+    <div class="context-colors">
+      <div class="color-badge" data-color="#f4f4f5" style="background: #f4f4f5;" title="Varsayılan"></div>
+      <div class="color-badge" data-color="#8b5cf6" style="background: #8b5cf6;" title="Mor"></div>
+      <div class="color-badge" data-color="#06b6d4" style="background: #06b6d4;" title="Camgöbeği"></div>
+      <div class="color-badge" data-color="#22c55e" style="background: #22c55e;" title="Yeşil"></div>
+      <div class="color-badge" data-color="#f59e0b" style="background: #f59e0b;" title="Turuncu"></div>
+      <div class="color-badge" data-color="#f43f5e" style="background: #f43f5e;" title="Kırmızı"></div>
+    </div>
+    <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 6px 0;"></div>
     <button class="context-btn danger" id="btnDeleteBlock">🗑️ Sil</button>
   </div>
 

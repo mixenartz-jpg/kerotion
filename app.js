@@ -41,9 +41,12 @@ let activeJournalDate = null;
 
 /* ---------- POMODORO STATE ---------- */
 let pomoTimer = null;
+let pomoWorkMins = 25;
+let pomoBreakMins = 5;
 let pomoTimeLeft = 25 * 60;
 let pomoIsRunning = false;
-let pomoCurrentMode = 25; // mins
+let pomoState = "idle"; // "idle", "work", "break"
+let pomoCycleCount = 0;
 
 function loadData() {
   const data = localStorage.getItem(LS_KEY);
@@ -93,14 +96,27 @@ const DOM = {
   btnShowRoutines: document.getElementById("btnShowRoutines"),
   
   // POMODORO DOM
+  pomoZoneBtn: document.getElementById("btnPomoZone"),
   pomoTimeDisplay: document.getElementById("pomoTimeDisplay"),
+  pomoStatusText: document.getElementById("pomoStatusText"),
   pomoModes: document.querySelectorAll(".pomo-mode"),
+  pomoCustomWork: document.getElementById("pomoCustomWork"),
+  pomoCustomBreak: document.getElementById("pomoCustomBreak"),
+  pomoApplyCustom: document.getElementById("btnPomoApplyCustom"),
   pomoPlayPause: document.getElementById("pomoPlayPause"),
   pomoReset: document.getElementById("pomoReset"),
   
+  // THE ZONE
+  theZone: document.getElementById("theZone"),
+  btnZoneExit: document.getElementById("btnZoneExit"),
+  zoneStatusText: document.getElementById("zoneStatusText"),
+  zoneTimerDisplay: document.getElementById("zoneTimerDisplay"),
+  zoneCycleDisplay: document.getElementById("zoneCycleDisplay"),
+  
   // CONTEXT MENU
   blockContextMenu: document.getElementById("blockContextMenu"),
-  btnDeleteBlock: document.getElementById("btnDeleteBlock")
+  btnDeleteBlock: document.getElementById("btnDeleteBlock"),
+  contextColors: document.querySelectorAll(".color-badge")
 };
 
 let slashMenuState = {
@@ -394,6 +410,11 @@ function createBlockElement(block) {
 
   wrap.appendChild(controls);
   wrap.appendChild(el);
+  
+  if (block.color && block.color !== "#f4f4f5") {
+    el.style.color = block.color;
+  }
+  
   return wrap;
 }
 
@@ -623,7 +644,21 @@ function attachGlobalListeners() {
   DOM.pomoPlayPause.addEventListener("click", togglePomoTimer);
   DOM.pomoReset.addEventListener("click", resetPomoTimer);
   DOM.pomoModes.forEach(btn => {
-    btn.addEventListener("click", () => setPomoMode(parseInt(btn.dataset.time)));
+    btn.addEventListener("click", () => setPomoMode(parseInt(btn.dataset.w), parseInt(btn.dataset.b)));
+  });
+  DOM.pomoApplyCustom.addEventListener("click", () => {
+    const w = parseInt(DOM.pomoCustomWork.value) || 25;
+    const b = parseInt(DOM.pomoCustomBreak.value) || 5;
+    setPomoMode(w, b);
+  });
+  
+  // THE ZONE EVENTS
+  DOM.pomoZoneBtn.addEventListener("click", toggleZone);
+  DOM.btnZoneExit.addEventListener("click", toggleZone);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !DOM.theZone.classList.contains("zone-hidden")) {
+      toggleZone();
+    }
   });
   
   // CONTEXT MENU GLOBAL CLOSE
@@ -637,6 +672,14 @@ function attachGlobalListeners() {
       deleteBlock(activeContextBlockId);
       hideContextMenu();
     }
+  });
+  DOM.contextColors.forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      if (activeContextBlockId) {
+        changeBlockColor(activeContextBlockId, e.target.dataset.color);
+        hideContextMenu();
+      }
+    });
   });
 }
 
@@ -852,6 +895,17 @@ function hideContextMenu() {
   activeContextBlockId = null;
 }
 
+function changeBlockColor(id, color) {
+  const page = getActivePage();
+  const block = page.blocks.find(b => b.id === id);
+  if(block) {
+    block.color = color;
+    scheduleSave();
+    // Render blocks to show the applied style safely
+    renderBlocks();
+  }
+}
+
 /* ---------- 11. POMODORO TIMER ---------- */
 function formatPomoTime(seconds) {
   const m = Math.floor(seconds / 60).toString().padStart(2, "0");
@@ -861,9 +915,23 @@ function formatPomoTime(seconds) {
 
 function updatePomoDisplay() {
   const tStr = formatPomoTime(pomoTimeLeft);
+  
+  // Sidebar UI
   DOM.pomoTimeDisplay.textContent = tStr;
+  let statusText = "Bekliyor";
+  if (pomoState === "work") statusText = "ÇALIŞMA";
+  else if (pomoState === "break") statusText = "MOLA";
+  DOM.pomoStatusText.textContent = `Durum: ${statusText} (Seans: ${pomoCycleCount})`;
+  
+  // The Zone UI
+  DOM.zoneTimerDisplay.textContent = tStr;
+  DOM.zoneStatusText.textContent = pomoState === "work" ? "ODAK: ÇALIŞMA" : pomoState === "break" ? "ZİHİN: MOLA" : "ODAK MERKEZİ";
+  DOM.zoneCycleDisplay.textContent = `Tamamlanan Seans: ${pomoCycleCount}`;
+  
+  // Doc Title
   if(pomoIsRunning) {
-    document.title = `(${tStr}) Kerotion`;
+    const prefix = pomoState === "work" ? "🧠" : "☕";
+    document.title = `${prefix} [${tStr}] Kerotion`;
   } else {
     document.title = "Kerotion — Workspace";
   }
@@ -880,32 +948,61 @@ function playPomoSound() {
     
     gainNode.gain.setValueAtTime(0, ctx.currentTime);
     gainNode.gain.linearRampToValueAtTime(1, ctx.currentTime + 0.05);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
     
     osc.connect(gainNode);
     gainNode.connect(ctx.destination);
     osc.start();
-    osc.stop(ctx.currentTime + 0.5);
+    osc.stop(ctx.currentTime + 0.7);
   } catch(e) { console.log("Audio not supported"); }
+}
+
+function notifyPomoEnd(isWork) {
+  playPomoSound();
+  if (Notification.permission === "granted") {
+    new Notification(isWork ? "☕ Odak Seansı Bitti - Mola Zamanı" : "🧠 Mola Bitti - Çalışma Zamanı", {
+      body: isWork ? "Gerçekten iyi bir odaklandın, arkanı yaslan ve dinlen." : "Zinciri kırmıyoruz. Sonraki adıma geçelim."
+    });
+  }
 }
 
 function endPomodoro() {
   clearInterval(pomoTimer);
   pomoIsRunning = false;
   DOM.pomoPlayPause.textContent = "▶";
-  playPomoSound();
+  
+  if (pomoState === "work") {
+    notifyPomoEnd(true);
+    pomoCycleCount++;
+    const today = getTodayDateStr();
+    if(!routinesData.habits[today]) routinesData.habits[today] = {};
+    routinesData.habits[today]["Pomodoro_Sayisi"] = (routinesData.habits[today]["Pomodoro_Sayisi"] || 0) + 1;
+    scheduleSave();
+    if(currentView === "routines") renderRoutinesGrid();
+    
+    pomoState = "break";
+    pomoTimeLeft = pomoBreakMins * 60;
+  } else if (pomoState === "break") {
+    notifyPomoEnd(false);
+    pomoState = "work";
+    pomoTimeLeft = pomoWorkMins * 60;
+  }
+  
   updatePomoDisplay();
-  
-  const today = getTodayDateStr();
-  if(!routinesData.habits[today]) routinesData.habits[today] = {};
-  routinesData.habits[today]["Pomodoro_Sayisi"] = (routinesData.habits[today]["Pomodoro_Sayisi"] || 0) + 1;
-  scheduleSave();
-  
-  if(currentView === "routines") renderRoutinesGrid();
 }
 
 function startPomoTimer() {
+  if (Notification.permission !== "granted" && Notification.permission !== "denied") {
+    Notification.requestPermission();
+  }
+  
   if(pomoTimeLeft <= 0) return;
+  
+  if (pomoState === "idle") {
+    pomoState = "work";
+    pomoTimeLeft = pomoWorkMins * 60;
+  }
+  
   pomoIsRunning = true;
   DOM.pomoPlayPause.textContent = "⏸";
   updatePomoDisplay();
@@ -928,20 +1025,29 @@ function togglePomoTimer() {
   }
 }
 
+function setPomoMode(w, b) {
+  pomoWorkMins = w;
+  pomoBreakMins = b;
+  pomoCycleCount = 0;
+  resetPomoTimer();
+  DOM.pomoModes.forEach(btn => {
+    const isMatch = parseInt(btn.dataset.w) === w && parseInt(btn.dataset.b) === b;
+    btn.classList.toggle("active", isMatch);
+  });
+}
+
 function resetPomoTimer() {
   clearInterval(pomoTimer);
   pomoIsRunning = false;
-  pomoTimeLeft = pomoCurrentMode * 60;
+  pomoState = "idle";
+  pomoTimeLeft = pomoWorkMins * 60;
   DOM.pomoPlayPause.textContent = "▶";
+  DOM.pomoModes.forEach(btn => btn.classList.remove("active"));
   updatePomoDisplay();
 }
 
-function setPomoMode(modeMins) {
-  pomoCurrentMode = modeMins;
-  resetPomoTimer();
-  DOM.pomoModes.forEach(btn => {
-    btn.classList.toggle("active", parseInt(btn.dataset.time) === modeMins);
-  });
+function toggleZone() {
+  DOM.theZone.classList.toggle("zone-hidden");
 }
 
 document.addEventListener("DOMContentLoaded", init);
