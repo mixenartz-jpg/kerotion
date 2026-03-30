@@ -40,6 +40,25 @@
         </nav>
       </div>
     </div>
+
+    <!-- YENİ: POMODORO SAYAÇ -->
+    <div class="sidebar-pomodoro" id="pomodoroContainer">
+      <div class="pomo-header">
+        <span>⏱️ Odak Sayacı</span>
+      </div>
+      <div class="pomo-display" id="pomoTimeDisplay">25:00</div>
+      
+      <div class="pomo-modes">
+        <button class="pomo-mode active" data-time="25">25</button>
+        <button class="pomo-mode" data-time="50">50</button>
+        <button class="pomo-mode" data-time="60">60</button>
+      </div>
+
+      <div class="pomo-controls">
+        <button class="pomo-btn play" id="pomoPlayPause" title="Başlat/Duraklat">▶</button>
+        <button class="pomo-btn reset" id="pomoReset" title="Sıfırla">↺</button>
+      </div>
+    </div>
   </aside>
 
   <!-- Sidebar kapalıyken aç butonu -->
@@ -128,6 +147,11 @@
       <li class="slash-menu-item" data-type="ul"><span class="slash-icon">•</span>Maddeli Liste</li>
       <li class="slash-menu-item" data-type="todo"><span class="slash-icon">☑</span>Yapılacaklar</li>
     </ul>
+  </div>
+
+  <!-- ========== BLOCK CONTEXT MENU ========== -->
+  <div class="block-context-menu" id="blockContextMenu" style="display: none;">
+    <button class="context-btn danger" id="btnDeleteBlock">🗑️ Sil</button>
   </div>
 
   <script src="app.js"></script>

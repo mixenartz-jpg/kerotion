@@ -39,6 +39,12 @@ let routinesData = {
 let currentView = "pages";
 let activeJournalDate = null;
 
+/* ---------- POMODORO STATE ---------- */
+let pomoTimer = null;
+let pomoTimeLeft = 25 * 60;
+let pomoIsRunning = false;
+let pomoCurrentMode = 25; // mins
+
 function loadData() {
   const data = localStorage.getItem(LS_KEY);
   pages = data ? JSON.parse(data) : DEFAULT_DATA;
@@ -84,7 +90,17 @@ const DOM = {
   routinesView: document.getElementById("routinesView"),
   btnShowPages: document.getElementById("btnShowPages"),
   btnShowJournal: document.getElementById("btnShowJournal"),
-  btnShowRoutines: document.getElementById("btnShowRoutines")
+  btnShowRoutines: document.getElementById("btnShowRoutines"),
+  
+  // POMODORO DOM
+  pomoTimeDisplay: document.getElementById("pomoTimeDisplay"),
+  pomoModes: document.querySelectorAll(".pomo-mode"),
+  pomoPlayPause: document.getElementById("pomoPlayPause"),
+  pomoReset: document.getElementById("pomoReset"),
+  
+  // CONTEXT MENU
+  blockContextMenu: document.getElementById("blockContextMenu"),
+  btnDeleteBlock: document.getElementById("btnDeleteBlock")
 };
 
 let slashMenuState = {
@@ -266,6 +282,71 @@ function createBlockElement(block) {
   const btnDrag = document.createElement("div");
   btnDrag.className = "block-btn";
   btnDrag.innerHTML = "⋮⋮"; // drag handle icon
+  btnDrag.draggable = true;
+  
+  btnDrag.addEventListener("click", (e) => {
+    e.stopPropagation();
+    showContextMenu(e.pageX + 10, e.pageY + 10, block.id);
+  });
+  
+  // Drag & Drop
+  btnDrag.addEventListener("dragstart", (e) => {
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", block.id);
+    setTimeout(() => wrap.classList.add("dragging"), 0);
+  });
+  
+  btnDrag.addEventListener("dragend", () => {
+    wrap.classList.remove("dragging");
+    document.querySelectorAll(".kerotion-block-wrap").forEach(el => {
+      el.classList.remove("drag-over", "drag-over-bottom");
+    });
+  });
+
+  wrap.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+    
+    const rect = wrap.getBoundingClientRect();
+    const midY = rect.top + rect.height / 2;
+    wrap.classList.remove("drag-over", "drag-over-bottom");
+    if (e.clientY < midY) {
+      wrap.classList.add("drag-over");
+    } else {
+      wrap.classList.add("drag-over-bottom");
+    }
+  });
+
+  wrap.addEventListener("dragleave", () => {
+    wrap.classList.remove("drag-over", "drag-over-bottom");
+  });
+
+  wrap.addEventListener("drop", (e) => {
+    e.preventDefault();
+    wrap.classList.remove("drag-over", "drag-over-bottom");
+    
+    const draggedId = e.dataTransfer.getData("text/plain");
+    if (draggedId === block.id) return;
+    
+    const page = getActivePage();
+    const draggedIdx = page.blocks.findIndex(b => b.id === draggedId);
+    const targetIdx = page.blocks.findIndex(b => b.id === block.id);
+    if (draggedIdx < 0 || targetIdx < 0) return;
+    
+    const rect = wrap.getBoundingClientRect();
+    const midY = rect.top + rect.height / 2;
+    const isBottom = e.clientY >= midY;
+    
+    const [draggedBlock] = page.blocks.splice(draggedIdx, 1);
+    
+    const newTargetIdx = page.blocks.findIndex(b => b.id === block.id);
+    const insertIdx = isBottom ? newTargetIdx + 1 : newTargetIdx;
+    
+    page.blocks.splice(insertIdx, 0, draggedBlock);
+    scheduleSave();
+    renderBlocks();
+  });
+
   controls.appendChild(btnPlus);
   controls.appendChild(btnDrag);
 
@@ -537,6 +618,26 @@ function attachGlobalListeners() {
   document.getElementById("newRoutineInput").addEventListener("keydown", (e) => {
     if(e.key === "Enter") addRoutine();
   });
+  
+  // POMODORO EVENTS
+  DOM.pomoPlayPause.addEventListener("click", togglePomoTimer);
+  DOM.pomoReset.addEventListener("click", resetPomoTimer);
+  DOM.pomoModes.forEach(btn => {
+    btn.addEventListener("click", () => setPomoMode(parseInt(btn.dataset.time)));
+  });
+  
+  // CONTEXT MENU GLOBAL CLOSE
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".block-context-menu") && !e.target.closest(".block-btn")) {
+      hideContextMenu();
+    }
+  });
+  DOM.btnDeleteBlock.addEventListener("click", () => {
+    if (activeContextBlockId) {
+      deleteBlock(activeContextBlockId);
+      hideContextMenu();
+    }
+  });
 }
 
 function init() {
@@ -734,6 +835,113 @@ function addRoutine() {
     renderRoutinesGrid();
   }
   document.getElementById("newRoutineInput").value = "";
+}
+
+/* ---------- 10. BLOCK CONTEXT MENU ---------- */
+let activeContextBlockId = null;
+
+function showContextMenu(x, y, blockId) {
+  activeContextBlockId = blockId;
+  DOM.blockContextMenu.style.display = "block";
+  DOM.blockContextMenu.style.left = `${x}px`;
+  DOM.blockContextMenu.style.top = `${y}px`;
+}
+
+function hideContextMenu() {
+  DOM.blockContextMenu.style.display = "none";
+  activeContextBlockId = null;
+}
+
+/* ---------- 11. POMODORO TIMER ---------- */
+function formatPomoTime(seconds) {
+  const m = Math.floor(seconds / 60).toString().padStart(2, "0");
+  const s = (seconds % 60).toString().padStart(2, "0");
+  return `${m}:${s}`;
+}
+
+function updatePomoDisplay() {
+  const tStr = formatPomoTime(pomoTimeLeft);
+  DOM.pomoTimeDisplay.textContent = tStr;
+  if(pomoIsRunning) {
+    document.title = `(${tStr}) Kerotion`;
+  } else {
+    document.title = "Kerotion — Workspace";
+  }
+}
+
+function playPomoSound() {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(800, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.1);
+    
+    gainNode.gain.setValueAtTime(0, ctx.currentTime);
+    gainNode.gain.linearRampToValueAtTime(1, ctx.currentTime + 0.05);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+    
+    osc.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.5);
+  } catch(e) { console.log("Audio not supported"); }
+}
+
+function endPomodoro() {
+  clearInterval(pomoTimer);
+  pomoIsRunning = false;
+  DOM.pomoPlayPause.textContent = "▶";
+  playPomoSound();
+  updatePomoDisplay();
+  
+  const today = getTodayDateStr();
+  if(!routinesData.habits[today]) routinesData.habits[today] = {};
+  routinesData.habits[today]["Pomodoro_Sayisi"] = (routinesData.habits[today]["Pomodoro_Sayisi"] || 0) + 1;
+  scheduleSave();
+  
+  if(currentView === "routines") renderRoutinesGrid();
+}
+
+function startPomoTimer() {
+  if(pomoTimeLeft <= 0) return;
+  pomoIsRunning = true;
+  DOM.pomoPlayPause.textContent = "⏸";
+  updatePomoDisplay();
+  
+  pomoTimer = setInterval(() => {
+    pomoTimeLeft--;
+    updatePomoDisplay();
+    if (pomoTimeLeft <= 0) endPomodoro();
+  }, 1000);
+}
+
+function togglePomoTimer() {
+  if(pomoIsRunning) {
+    clearInterval(pomoTimer);
+    pomoIsRunning = false;
+    DOM.pomoPlayPause.textContent = "▶";
+    updatePomoDisplay();
+  } else {
+    startPomoTimer();
+  }
+}
+
+function resetPomoTimer() {
+  clearInterval(pomoTimer);
+  pomoIsRunning = false;
+  pomoTimeLeft = pomoCurrentMode * 60;
+  DOM.pomoPlayPause.textContent = "▶";
+  updatePomoDisplay();
+}
+
+function setPomoMode(modeMins) {
+  pomoCurrentMode = modeMins;
+  resetPomoTimer();
+  DOM.pomoModes.forEach(btn => {
+    btn.classList.toggle("active", parseInt(btn.dataset.time) === modeMins);
+  });
 }
 
 document.addEventListener("DOMContentLoaded", init);

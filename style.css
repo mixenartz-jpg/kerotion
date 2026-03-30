@@ -918,3 +918,137 @@ body {
   .sidebar { position: absolute; }
 }
 
+/* ---------- 8. POMODORO, DRAG & DROP, CONTEXT MENU ---------- */
+
+/* Pomodoro UI */
+.sidebar-pomodoro {
+  margin-top: auto;
+  border-top: 1px solid var(--border);
+  padding: 16px;
+  background: rgba(0,0,0,0.2);
+}
+.pomo-header {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 12px;
+}
+.pomo-display {
+  font-family: var(--font-mono);
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--cyan);
+  text-shadow: var(--cyan-glow);
+  text-align: center;
+  margin-bottom: 12px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 2px;
+}
+.pomo-modes {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+.pomo-mode {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 11px;
+  padding: 4px 0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+}
+.pomo-mode.active, .pomo-mode:hover {
+  background: var(--cyan);
+  color: #000;
+  border-color: var(--cyan);
+  box-shadow: var(--cyan-glow);
+}
+.pomo-controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+.pomo-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 14px;
+}
+.pomo-btn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: var(--accent-glow);
+}
+
+/* Drag and Drop Settings */
+.kerotion-block-wrap.dragging {
+  opacity: 0.4;
+  background: var(--hover-bg);
+  border-radius: var(--radius);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+.kerotion-block-wrap.drag-over {
+  border-top: 2px solid var(--accent);
+  margin-top: 4px;
+  padding-top: 2px;
+}
+.kerotion-block-wrap.drag-over-bottom {
+  border-bottom: 2px solid var(--accent);
+  margin-bottom: 4px;
+  padding-bottom: 2px;
+}
+.block-btn[draggable="true"] {
+  cursor: grab;
+}
+.block-btn[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+/* Context Menu CSS */
+.block-context-menu {
+  position: absolute;
+  background: rgba(18, 18, 22, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+  animation: modalPop 0.1s ease-out;
+  min-width: 120px;
+}
+.context-btn {
+  background: transparent;
+  border: none;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  transition: background 0.2s;
+}
+.context-btn.danger {
+  color: var(--danger);
+}
+.context-btn.danger:hover {
+  background: rgba(244, 63, 94, 0.15);
+}
+
