@@ -36,6 +36,22 @@ let routinesData = {
   routines: ["YKS Paragraf & Problem", "Fitness / Antrenman", "Kodlama / Proje Geliştirme"],
   habits: {}
 };
+
+// --- SECOND BRAIN DATA ---
+const LS_TODO = "kerotion_todo";
+const LS_KANBAN = "kerotion_kanban";
+const LS_YKS = "kerotion_yks";
+const LS_FITNESS = "kerotion_fitness";
+const LS_LINKS = "kerotion_links";
+const LS_INBOX = "kerotion_inbox";
+
+let todoData = [];
+let kanbanData = { ideas: [], inProgress: [], done: [] };
+let yksData = [];
+let fitnessData = { log: [], cal: "", pro: "" };
+let linksData = [];
+let inboxData = [];
+
 let currentView = "pages";
 let activeJournalDate = null;
 
@@ -51,15 +67,32 @@ let pomoCycleCount = 0;
 function loadData() {
   const data = localStorage.getItem(LS_KEY);
   pages = data ? JSON.parse(data) : DEFAULT_DATA;
-  if (!activePageId && pages.length > 0) {
-    activePageId = pages[0].id;
-  }
+  if (!activePageId && pages.length > 0) activePageId = pages[0].id;
   
   const jData = localStorage.getItem(LS_JOURNAL);
   if (jData) journalData = JSON.parse(jData);
   
   const rData = localStorage.getItem(LS_ROUTINES);
   if (rData) routinesData = JSON.parse(rData);
+
+  // Load Second Brain
+  const tData = localStorage.getItem(LS_TODO);
+  if (tData) todoData = JSON.parse(tData);
+
+  const kData = localStorage.getItem(LS_KANBAN);
+  if (kData) kanbanData = JSON.parse(kData);
+
+  const yData = localStorage.getItem(LS_YKS);
+  if (yData) yksData = JSON.parse(yData);
+
+  const fData = localStorage.getItem(LS_FITNESS);
+  if (fData) fitnessData = JSON.parse(fData);
+
+  const lData = localStorage.getItem(LS_LINKS);
+  if (lData) linksData = JSON.parse(lData);
+
+  const iData = localStorage.getItem(LS_INBOX);
+  if (iData) inboxData = JSON.parse(iData);
 }
 
 function scheduleSave() {
@@ -68,6 +101,14 @@ function scheduleSave() {
     localStorage.setItem(LS_KEY, JSON.stringify(pages));
     localStorage.setItem(LS_JOURNAL, JSON.stringify(journalData));
     localStorage.setItem(LS_ROUTINES, JSON.stringify(routinesData));
+    
+    // Save Second Brain
+    localStorage.setItem(LS_TODO, JSON.stringify(todoData));
+    localStorage.setItem(LS_KANBAN, JSON.stringify(kanbanData));
+    localStorage.setItem(LS_YKS, JSON.stringify(yksData));
+    localStorage.setItem(LS_FITNESS, JSON.stringify(fitnessData));
+    localStorage.setItem(LS_LINKS, JSON.stringify(linksData));
+    localStorage.setItem(LS_INBOX, JSON.stringify(inboxData));
   }, 400);
 }
 
@@ -94,6 +135,21 @@ const DOM = {
   btnShowPages: document.getElementById("btnShowPages"),
   btnShowJournal: document.getElementById("btnShowJournal"),
   btnShowRoutines: document.getElementById("btnShowRoutines"),
+  
+  // SECOND BRAIN VIEWS & MENUS
+  inboxView: document.getElementById("inboxView"),
+  todoView: document.getElementById("todoView"),
+  kanbanView: document.getElementById("kanbanView"),
+  yksView: document.getElementById("yksView"),
+  fitnessView: document.getElementById("fitnessView"),
+  linksView: document.getElementById("linksView"),
+
+  btnShowInbox: document.getElementById("btnShowInbox"),
+  btnShowTodo: document.getElementById("btnShowTodo"),
+  btnShowKanban: document.getElementById("btnShowKanban"),
+  btnShowYks: document.getElementById("btnShowYks"),
+  btnShowFitness: document.getElementById("btnShowFitness"),
+  btnShowLinks: document.getElementById("btnShowLinks"),
   
   // POMODORO DOM
   pomoZoneBtn: document.getElementById("btnPomoZone"),
@@ -624,6 +680,12 @@ function attachGlobalListeners() {
   DOM.btnShowPages.addEventListener("click", () => switchView("pages"));
   DOM.btnShowJournal.addEventListener("click", () => switchView("journal"));
   DOM.btnShowRoutines.addEventListener("click", () => switchView("routines"));
+  DOM.btnShowInbox.addEventListener("click", () => switchView("inbox"));
+  DOM.btnShowTodo.addEventListener("click", () => switchView("todo"));
+  DOM.btnShowKanban.addEventListener("click", () => switchView("kanban"));
+  DOM.btnShowYks.addEventListener("click", () => switchView("yks"));
+  DOM.btnShowFitness.addEventListener("click", () => switchView("fitness"));
+  DOM.btnShowLinks.addEventListener("click", () => switchView("links"));
   
   // JOURNAL EVENTS
   document.getElementById("btnNewJournalDay").addEventListener("click", () => {
@@ -696,21 +758,30 @@ function init() {
 function switchView(viewName) {
   currentView = viewName;
   
-  DOM.btnShowPages.classList.toggle("active", viewName === "pages");
-  DOM.btnShowJournal.classList.toggle("active", viewName === "journal");
-  DOM.btnShowRoutines.classList.toggle("active", viewName === "routines");
+  const views = ["pages", "journal", "routines", "inbox", "todo", "kanban", "yks", "fitness", "links"];
   
-  DOM.pageView.classList.toggle("view-hidden", viewName !== "pages");
-  DOM.pageView.classList.toggle("view-active", viewName === "pages");
+  views.forEach(v => {
+    // Buttons
+    const btn = DOM["btnShow" + v.charAt(0).toUpperCase() + v.slice(1)];
+    if(btn) btn.classList.toggle("active", viewName === v);
+    
+    // View Containers
+    const container = DOM[v + "View"];
+    if(container) {
+      container.classList.toggle("view-hidden", viewName !== v);
+      container.classList.toggle("view-active", viewName === v);
+    }
+  });
   
-  DOM.journalView.classList.toggle("view-hidden", viewName !== "journal");
-  DOM.journalView.classList.toggle("view-active", viewName === "journal");
-  
-  DOM.routinesView.classList.toggle("view-hidden", viewName !== "routines");
-  DOM.routinesView.classList.toggle("view-active", viewName === "routines");
-  
+  // Render Specific Views
   if (viewName === "journal") renderJournalList();
   if (viewName === "routines") renderRoutinesGrid();
+  if (viewName === "inbox") renderInbox();
+  if (viewName === "todo") renderTodo();
+  if (viewName === "kanban") renderKanban();
+  if (viewName === "yks") renderYksBar();
+  if (viewName === "fitness") renderFitness();
+  if (viewName === "links") renderLinks();
 }
 
 /* ---------- 8. JOURNAL MODULE ---------- */
@@ -1049,6 +1120,334 @@ function resetPomoTimer() {
 function toggleZone() {
   DOM.theZone.classList.toggle("zone-hidden");
 }
+
+/* ---------- 12. SECOND BRAIN (MODULES) ---------- */
+
+// --- 12.1 INBOX / BRAIN DUMP ---
+function renderInbox() {
+  const listEl = document.getElementById("inboxList");
+  listEl.innerHTML = "";
+  if (inboxData.length === 0) {
+    listEl.innerHTML = "<p style='color:var(--text-muted);'>Zihin çöplüğü temiz.</p>";
+    return;
+  }
+  [...inboxData].reverse().forEach((note, idx) => {
+    const item = document.createElement("div");
+    item.className = "todo-item";
+    
+    const text = document.createElement("span");
+    text.className = "todo-text";
+    text.textContent = note;
+    
+    const btnDel = document.createElement("button");
+    btnDel.className = "todo-trash";
+    btnDel.innerHTML = "🗑";
+    btnDel.onclick = () => {
+      inboxData.splice(inboxData.length - 1 - idx, 1);
+      scheduleSave();
+      renderInbox();
+    };
+    
+    item.appendChild(text);
+    item.appendChild(btnDel);
+    listEl.appendChild(item);
+  });
+}
+
+const bdModal = document.getElementById("brainDumpModal");
+const bdInput = document.getElementById("brainDumpInput");
+
+document.addEventListener("keydown", (e) => {
+  // Ctrl + Space
+  if (e.ctrlKey && e.code === "Space") {
+    e.preventDefault();
+    bdModal.classList.remove("hidden");
+    bdInput.value = "";
+    bdInput.focus();
+  }
+  // ESC to close
+  if (e.key === "Escape" && !bdModal.classList.contains("hidden")) {
+    bdModal.classList.add("hidden");
+    const p = document.getElementById("pageTitle");
+    if(p) p.focus();
+  }
+});
+
+bdInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && bdInput.value.trim() !== "") {
+    e.preventDefault();
+    inboxData.push(bdInput.value.trim());
+    scheduleSave();
+    bdModal.classList.add("hidden");
+    if(currentView === "inbox") renderInbox();
+  }
+});
+
+// --- 12.2 GÜNLÜK GÖREVLER (TODO) ---
+const todoInput = document.getElementById("todoInput");
+function renderTodo() {
+  const listEl = document.getElementById("todoList");
+  listEl.innerHTML = "";
+  if(todoData.length === 0) {
+    listEl.innerHTML = "<p style='color:var(--text-muted);'>Bugün için planlanan görev yok.</p>";
+    return;
+  }
+  todoData.forEach((td, idx) => {
+    const item = document.createElement("div");
+    item.className = "todo-item" + (td.done ? " checked" : "");
+    
+    const chk = document.createElement("input");
+    chk.type = "checkbox";
+    chk.checked = td.done;
+    chk.onchange = () => {
+      todoData[idx].done = chk.checked;
+      scheduleSave();
+      renderTodo();
+    };
+    
+    const text = document.createElement("span");
+    text.className = "todo-text";
+    text.textContent = td.text;
+    
+    const btnDel = document.createElement("button");
+    btnDel.className = "todo-trash";
+    btnDel.innerHTML = "🗑";
+    btnDel.onclick = () => {
+      todoData.splice(idx, 1);
+      scheduleSave();
+      renderTodo();
+    };
+    
+    item.appendChild(chk);
+    item.appendChild(text);
+    item.appendChild(btnDel);
+    listEl.appendChild(item);
+  });
+}
+todoInput.addEventListener("keydown", (e) => {
+  if(e.key === "Enter" && todoInput.value.trim() !== "") {
+    todoData.push({ text: todoInput.value.trim(), done: false });
+    todoInput.value = "";
+    scheduleSave();
+    renderTodo();
+  }
+});
+
+// --- 12.3 PROJE PANOSU (KANBAN) ---
+const kInput = document.getElementById("kanbanInput");
+const btnKanbanAdd = document.getElementById("btnKanbanAdd");
+
+function renderKanban() {
+  ["ideas", "inProgress", "done"].forEach(colId => {
+    const colEl = document.getElementById(colId === "ideas" ? "kanbanIdeas" : colId === "inProgress" ? "kanbanProgress" : "kanbanDone");
+    colEl.innerHTML = "";
+    
+    kanbanData[colId].forEach((task, idx) => {
+      const card = document.createElement("div");
+      card.className = "kanban-card";
+      card.draggable = true;
+      card.innerHTML = `<span>${task}</span> <button class="todo-trash" style="font-size:12px;">🗑</button>`;
+      
+      card.querySelector("button").onclick = () => {
+        kanbanData[colId].splice(idx, 1);
+        scheduleSave();
+        renderKanban();
+      };
+      
+      card.addEventListener("dragstart", (e) => {
+        e.dataTransfer.setData("text/plain", JSON.stringify({ colId, idx }));
+      });
+      
+      colEl.appendChild(card);
+    });
+  });
+}
+
+function addKanbanCard() {
+  const val = kInput.value.trim();
+  if(val !== "") {
+    kanbanData.ideas.push(val);
+    kInput.value = "";
+    scheduleSave();
+    renderKanban();
+  }
+}
+kInput.addEventListener("keydown", (e) => { if (e.key === "Enter") addKanbanCard(); });
+btnKanbanAdd.addEventListener("click", addKanbanCard);
+
+document.querySelectorAll(".kanban-col").forEach(col => {
+  col.addEventListener("dragover", e => {
+    e.preventDefault();
+    col.classList.add("drag-over-kanban");
+  });
+  col.addEventListener("dragleave", e => {
+    col.classList.remove("drag-over-kanban");
+  });
+  col.addEventListener("drop", e => {
+    e.preventDefault();
+    col.classList.remove("drag-over-kanban");
+    try {
+      const data = JSON.parse(e.dataTransfer.getData("text/plain"));
+      const targetColId = col.dataset.col;
+      if (data.colId === targetColId) return;
+      const taskText = kanbanData[data.colId].splice(data.idx, 1)[0];
+      kanbanData[targetColId].push(taskText);
+      scheduleSave();
+      renderKanban();
+    } catch(err){}
+  });
+});
+
+// --- 12.4 YKS ANALIZ BARS (CSS) ---
+function renderYksBar() {
+  const chartEl = document.getElementById("yksChartArea");
+  chartEl.innerHTML = "";
+  if(yksData.length === 0) {
+    chartEl.innerHTML = "<p style='color:var(--text-muted); padding: 20px;'>Net verisi bekleniyor...</p>";
+    return;
+  }
+  const maxNet = 120; // TYT Maximum
+  
+  yksData.forEach((entry, idx) => {
+    const wrap = document.createElement("div");
+    wrap.className = "yks-bar-wrap";
+    
+    const bar = document.createElement("div");
+    bar.className = "yks-bar";
+    const heightPct = Math.min((entry.net / maxNet) * 100, 100);
+    setTimeout(() => { bar.style.height = heightPct + "%"; }, 50);
+    bar.style.height = "0%";
+    
+    bar.title = `${entry.name}:\n${entry.net} Net (Çift tıkla sil)`;
+    
+    const val = document.createElement("div");
+    val.className = "yks-value";
+    val.textContent = entry.net;
+    
+    const label = document.createElement("div");
+    label.className = "yks-label";
+    label.textContent = entry.name;
+    
+    wrap.ondblclick = () => {
+      if(confirm(`"${entry.name}" denemesini silmek istiyor musunuz?`)){
+        yksData.splice(idx, 1);
+        scheduleSave();
+        renderYksBar();
+      }
+    };
+    
+    bar.appendChild(val);
+    bar.appendChild(label);
+    wrap.appendChild(bar);
+    chartEl.appendChild(wrap);
+  });
+}
+
+document.getElementById("btnYksAdd").addEventListener("click", () => {
+  const n = document.getElementById("yksNameInput").value.trim();
+  const v = parseFloat(document.getElementById("yksNetInput").value);
+  if (n && !isNaN(v)) {
+    yksData.push({ name: n, net: v });
+    document.getElementById("yksNameInput").value = "";
+    document.getElementById("yksNetInput").value = "";
+    scheduleSave();
+    renderYksBar();
+  }
+});
+
+// --- 12.5 FITNESS & MAKRO ---
+const iCal = document.getElementById("fitnessCalInput");
+const iPro = document.getElementById("fitnessProInput");
+const iLogText = document.getElementById("fitnessLogInput");
+
+function renderFitness() {
+  iCal.value = fitnessData.cal || "";
+  iPro.value = fitnessData.pro || "";
+  
+  const hEl = document.getElementById("fitnessHistoryList");
+  hEl.innerHTML = "";
+  if(!fitnessData.log || fitnessData.log.length === 0) {
+    hEl.innerHTML = "<p style='color:var(--text-muted); font-size:12px;'>Kayıt yok.</p>";
+    return;
+  }
+  [...fitnessData.log].reverse().forEach(log => {
+    const item = document.createElement("div");
+    item.className = "fitness-log-item";
+    item.innerHTML = `
+      <div class="fitness-log-date">${log.date}</div>
+      <div class="fitness-log-stats">🔥 ${log.cal} kcal | 🥩 ${log.pro}g protein</div>
+      <div class="fitness-log-text">${log.text}</div>
+    `;
+    hEl.appendChild(item);
+  });
+}
+
+iCal.addEventListener("input", () => { fitnessData.cal = iCal.value; scheduleSave(); });
+iPro.addEventListener("input", () => { fitnessData.pro = iPro.value; scheduleSave(); });
+
+document.getElementById("btnFitnessSave").addEventListener("click", () => {
+  if(!fitnessData.log) fitnessData.log = [];
+  const text = iLogText.value.trim();
+  if(!text) { alert("Antrenman notu boş bırakılamaz!"); return; }
+  
+  fitnessData.log.push({
+    date: getTodayDateStr(),
+    cal: fitnessData.cal || 0,
+    pro: fitnessData.pro || 0,
+    text: text
+  });
+  
+  iLogText.value = "";
+  scheduleSave();
+  renderFitness();
+});
+
+// --- 12.6 LINK VAULT ---
+function renderLinks() {
+  const grid = document.getElementById("linksGrid");
+  grid.innerHTML = "";
+  if(linksData.length === 0) {
+    grid.innerHTML = "<p style='color:var(--text-muted);'>Kasa boş.</p>";
+    return;
+  }
+  
+  linksData.forEach((link, idx) => {
+    const card = document.createElement("a");
+    card.className = "link-card";
+    card.href = link.url;
+    card.target = "_blank";
+    
+    card.innerHTML = `
+      <div style="display:flex; justify-content:space-between;">
+        <span class="link-title">${link.title}</span>
+        <button class="todo-trash" style="font-size:12px; z-index:10;" onclick="event.preventDefault(); window.deleteLink(${idx});">🗑</button>
+      </div>
+      <span class="link-url">${link.url}</span>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+window.deleteLink = function(idx) {
+  linksData.splice(idx, 1);
+  scheduleSave();
+  renderLinks();
+};
+
+document.getElementById("btnLinkAdd").addEventListener("click", () => {
+  const title = document.getElementById("linkTitleInput").value.trim();
+  const urlEl = document.getElementById("linkUrlInput");
+  let url = urlEl.value.trim();
+  
+  if (title && url) {
+    if(!url.startsWith("http")) url = "https://" + url;
+    linksData.push({ title, url });
+    document.getElementById("linkTitleInput").value = "";
+    urlEl.value = "";
+    scheduleSave();
+    renderLinks();
+  }
+});
 
 document.addEventListener("DOMContentLoaded", init);
 

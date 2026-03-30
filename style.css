@@ -1246,3 +1246,326 @@ body {
 }
 
 
+/* ---------- 9. SECOND BRAIN MODULES ---------- */
+
+/* Sidebar Logo */
+.sidebar-logo-img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  filter: brightness(0) invert(1) drop-shadow(0 0 5px rgba(255, 255, 255, 0.4));
+  transition: all 0.3s;
+}
+.sidebar-logo-img:hover {
+  filter: brightness(0) invert(1) drop-shadow(0 0 10px var(--cyan));
+}
+
+/* Common Inputs */
+.todo-input-group, .kanban-input-group, .yks-controls, .links-input-group {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.todo-input-group input, .kanban-input-group input, .yks-controls input, .links-input-group input {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-family: var(--font-ui);
+  transition: all 0.2s;
+  outline: none;
+}
+.todo-input-group input:focus, .kanban-input-group input:focus, .yks-controls input:focus, .links-input-group input:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+}
+
+/* To-Do Lists (Inbox & Daily) */
+.todo-list, .inbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  transition: all 0.2s;
+}
+.todo-item:hover {
+  border-color: rgba(255,255,255,0.2);
+}
+.todo-item.checked {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+.todo-text {
+  flex: 1;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+.todo-trash {
+  background: transparent;
+  border: none;
+  color: var(--danger);
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+.todo-trash:hover { opacity: 1; }
+
+/* Kanban Board */
+.kanban-board {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  min-height: 400px;
+  align-items: start;
+}
+.kanban-col {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 100%;
+}
+.kanban-col h3 {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.kanban-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 50px;
+}
+.kanban-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  padding: 12px;
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: 13px;
+  cursor: grab;
+  transition: all 0.2s;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.kanban-card:hover {
+  border-color: var(--cyan);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+.kanban-card:active { cursor: grabbing; }
+.kanban-col.drag-over-kanban {
+  background: rgba(6, 182, 212, 0.05);
+  border: 1px dashed var(--cyan);
+}
+
+/* YKS Chart CSS Bars */
+.yks-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  height: 300px;
+  margin-top: 40px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+.yks-bar-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  width: 40px;
+  position: relative;
+  transition: all 0.3s;
+}
+.yks-bar {
+  width: 100%;
+  background: linear-gradient(0deg, var(--accent) 0%, var(--cyan) 100%);
+  border-radius: 4px 4px 0 0;
+  box-shadow: var(--cyan-glow);
+  transition: height 0.5s ease-out;
+  position: relative;
+}
+.yks-value {
+  position: absolute;
+  top: -24px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  width: 100%;
+  text-align: center;
+}
+.yks-label {
+  position: absolute;
+  bottom: -24px;
+  font-size: 10px;
+  color: var(--text-muted);
+  width: 200%;
+  text-align: center;
+  left: -50%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Fitness */
+.fitness-dashboard {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.fitness-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 16px;
+  border-radius: var(--radius);
+}
+.fitness-card label {
+  display: block;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.fitness-card input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  outline: none;
+}
+.fitness-log textarea {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 12px;
+  border-radius: var(--radius);
+  font-family: var(--font-ui);
+  line-height: 1.5;
+  outline: none;
+  resize: vertical;
+}
+.fitness-log textarea:focus { border-color: var(--cyan); }
+.fitness-log-item {
+  background: rgba(255,255,255,0.02);
+  border-left: 3px solid var(--accent);
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  border-radius: 0 4px 4px 0;
+}
+.fitness-log-date {
+  font-size: 10px;
+  color: var(--cyan);
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+.fitness-log-stats {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+.fitness-log-text {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Link Vault */
+.links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+.link-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 16px;
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+.link-card:hover {
+  border-color: var(--cyan);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+.link-title {
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+}
+.link-url {
+  color: var(--cyan);
+  font-size: 11px;
+  word-break: break-all;
+}
+
+/* Brain Dump Modal (Ctrl+Space) */
+.braindump-modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.15s ease-out;
+}
+.braindump-modal.hidden { display: none !important; }
+.braindump-container {
+  width: 90%;
+  max-width: 600px;
+  background: rgba(18,18,22, 0.9);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  position: relative;
+}
+.bd-icon { font-size: 24px; }
+.braindump-container input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 20px;
+  padding: 16px 0;
+  outline: none;
+}
+.braindump-container input::placeholder { color: rgba(255,255,255,0.3); }
+.bd-hint {
+  position: absolute;
+  top: -24px;
+  right: 0;
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+}
+
+

@@ -11,7 +11,7 @@
   <!-- ========== SIDEBAR ========== -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <span class="sidebar-logo">📝</span>
+      <img src="logo.png" alt="Kerotion" class="sidebar-logo-img" />
       <h1 class="sidebar-title">Kerotion</h1>
       <button class="sidebar-toggle" id="sidebarToggle" title="Kenar çubuğunu kapat">‹</button>
     </div>
@@ -24,6 +24,12 @@
         </div>
         <nav class="main-menu" id="mainMenu">
           <button class="menu-item active" id="btnShowPages" title="Sayfalar">📄 Sayfalar</button>
+          <button class="menu-item" id="btnShowInbox" title="Zihin Çöplüğü">📥 Inbox</button>
+          <button class="menu-item" id="btnShowTodo" title="Görevlerim">📋 Görevlerim</button>
+          <button class="menu-item" id="btnShowKanban" title="Projeler (Kanban)">📌 Proje Panosu</button>
+          <button class="menu-item" id="btnShowYks" title="YKS Analizi">🎯 YKS İlerleme</button>
+          <button class="menu-item" id="btnShowFitness" title="Fitness & Makro">🏋️ Fitness</button>
+          <button class="menu-item" id="btnShowLinks" title="Link Kasası">🔗 Link Kasası</button>
           <button class="menu-item" id="btnShowJournal" title="Günlük">📓 Günlük</button>
           <button class="menu-item" id="btnShowRoutines" title="Disiplin">⚔️ Disiplin</button>
         </nav>
@@ -153,6 +159,109 @@
       </div>
     </div>
 
+    <!-- INBOX VIEW -->
+    <div class="editor-container view-hidden" id="inboxView">
+      <header class="page-header">
+        <h1 class="page-title">📥 Zihin Çöplüğü</h1>
+        <p class="view-subtitle">Aklına gelenler kaybolmasın. Kısayol: Ctrl+Space</p>
+      </header>
+      <div class="inbox-list" id="inboxList"></div>
+    </div>
+
+    <!-- TODO VIEW -->
+    <div class="editor-container view-hidden" id="todoView">
+      <header class="page-header">
+        <h1 class="page-title">📋 Günlük Görevler</h1>
+        <p class="view-subtitle">Bugün ne başarmak istiyorsun?</p>
+      </header>
+      <div class="todo-input-group">
+        <input type="text" id="todoInput" placeholder="Yeni görev ekle..." />
+      </div>
+      <div class="todo-list" id="todoList"></div>
+    </div>
+
+    <!-- KANBAN VIEW -->
+    <div class="editor-container view-hidden" id="kanbanView">
+      <header class="page-header">
+        <h1 class="page-title">📌 Proje Panosu</h1>
+        <p class="view-subtitle">Fikirleri hayata geçir.</p>
+      </header>
+      <div class="kanban-input-group">
+        <input type="text" id="kanbanInput" placeholder="Yeni kanban kartı oluştur..." />
+        <button id="btnKanbanAdd" class="btn-glow-small">Ekle</button>
+      </div>
+      <div class="kanban-board">
+        <div class="kanban-col" data-col="ideas">
+          <h3>Fikirler</h3>
+          <div class="kanban-cards" id="kanbanIdeas"></div>
+        </div>
+        <div class="kanban-col" data-col="inProgress">
+          <h3>Çalışılıyor ⏳</h3>
+          <div class="kanban-cards" id="kanbanProgress"></div>
+        </div>
+        <div class="kanban-col" data-col="done">
+          <h3>Tamamlananlar ✅</h3>
+          <div class="kanban-cards" id="kanbanDone"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- YKS VIEW -->
+    <div class="editor-container view-hidden" id="yksView">
+      <header class="page-header">
+        <h1 class="page-title">🎯 YKS İlerleme</h1>
+        <p class="view-subtitle">Tüm netlerini kaydet ve analiz et.</p>
+      </header>
+      <div class="yks-controls">
+        <input type="text" id="yksNameInput" placeholder="Deneme Adı (Örn: TYT 3D)" />
+        <input type="number" id="yksNetInput" placeholder="Net (Örn: 95.5)" step="0.25" />
+        <button id="btnYksAdd" class="btn-glow action">Ekle</button>
+      </div>
+      <div class="yks-chart" id="yksChartArea">
+        <!-- CSS Barları buraya dizilecek -->
+      </div>
+    </div>
+
+    <!-- FITNESS VIEW -->
+    <div class="editor-container view-hidden" id="fitnessView">
+      <header class="page-header">
+        <h1 class="page-title">🏋️ Fitness Makro</h1>
+        <p class="view-subtitle">Günlük kalori, protein ve log takibi.</p>
+      </header>
+      <div class="fitness-dashboard">
+        <div class="fitness-card">
+          <label>🔥 Kalori (kcal)</label>
+          <input type="number" id="fitnessCalInput" placeholder="Örn: 2500" />
+        </div>
+        <div class="fitness-card">
+          <label>🥩 Protein (g)</label>
+          <input type="number" id="fitnessProInput" placeholder="Örn: 150" />
+        </div>
+      </div>
+      <div class="fitness-log">
+        <label>Antrenman Notu (Günlük Log)</label>
+        <textarea id="fitnessLogInput" rows="4" placeholder="Bugün neler çalıştın?"></textarea>
+      </div>
+      <button id="btnFitnessSave" class="btn-glow success" style="margin-top:16px;">Bugünü Kaydet</button>
+      
+      <h3 style="margin-top:32px; font-size: 16px; color: var(--text-secondary);">Fitness Geçmişi</h3>
+      <div class="fitness-history" id="fitnessHistoryList"></div>
+    </div>
+
+    <!-- LINKS VIEW -->
+    <div class="editor-container view-hidden" id="linksView">
+      <header class="page-header">
+        <h1 class="page-title">🔗 Link Kasası</h1>
+        <p class="view-subtitle">Anti-scrolling deposu. Daha sonra incele.</p>
+      </header>
+      <div class="links-input-group">
+        <input type="text" id="linkTitleInput" placeholder="Başlık (Örn: React 19 Eğitimi)" />
+        <input type="url" id="linkUrlInput" placeholder="https://..." />
+        <button id="btnLinkAdd" class="btn-glow action">Kaydet</button>
+      </div>
+      <div class="links-grid" id="linksGrid"></div>
+    </div>
+
   </main>
 
   <!-- ========== SLASH MENÜ MODAL ========== -->
@@ -193,5 +302,14 @@
   </div>
 
   <script src="app.js"></script>
+
+  <!-- ========== BRAIN DUMP MODAL (Ctrl+Space) ========== -->
+  <div class="braindump-modal hidden" id="brainDumpModal">
+    <div class="braindump-container">
+      <span class="bd-icon">💡</span>
+      <input type="text" id="brainDumpInput" placeholder="Aklına geleni hemen yaz ve Enter'a bas..." autocomplete="off"/>
+      <div class="bd-hint">Vazgeçmek için ESC</div>
+    </div>
+  </div>
 </body>
 </html>
