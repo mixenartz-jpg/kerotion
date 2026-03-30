@@ -33,22 +33,30 @@ let saveTimer = null;
 
 let journalData = [];
 let routinesData = {
-  routines: ["YKS Paragraf & Problem", "Fitness / Antrenman", "Kodlama / Proje Geliştirme"],
+  routines: ["TYT Paragraf/Problem Çözüldü", "Günün Konu Tekrarı Yapıldı", "Kitap Okundu", "Kodlama/Proje Geliştirildi"],
   habits: {}
 };
 
 // --- SECOND BRAIN DATA ---
 const LS_TODO = "kerotion_todo";
 const LS_KANBAN = "kerotion_kanban";
-const LS_YKS = "kerotion_yks";
-const LS_FITNESS = "kerotion_fitness";
+const LS_YKS_MISTAKES = "kerotion_yks_mistakes";
+const LS_YKS_SYLLABUS = "kerotion_yks_syllabus";
 const LS_LINKS = "kerotion_links";
 const LS_INBOX = "kerotion_inbox";
 
 let todoData = [];
 let kanbanData = { ideas: [], inProgress: [], done: [] };
 let yksData = [];
-let fitnessData = { log: [], cal: "", pro: "" };
+let yksMistakesData = [];
+let yksSyllabusData = {
+  "TYT Matematik": ["Sayılar", "Bölünebilme", "Rasyonel Sayılar", "Denklemler", "Mutlak Değer", "Üslü Sayılar", "Köklü Sayılar", "Çarpanlara Ayırma", "Oran Orantı", "Problemler", "Mantık", "Kümeler", "Fonksiyonlar"],
+  "TYT Türkçe": ["Sözcük Anlamı", "Cümle Anlamı", "Paragraf", "Ses Bilgisi", "Yazım Kuralları", "Noktalama", "Sözcük Yapısı", "Cümle Ögeleri", "Fiiller"],
+  "AYT Matematik": ["Polinomlar", "2. Dereceden Denklemler", "Karmaşık Sayılar", "Trigonometri", "Logaritma", "Diziler", "Limit", "Türev", "İntegral"],
+  "TYT/AYT Fizik": ["Fizik Bilimine Giriş", "Madde ve Özellikleri", "Hareket ve Kuvvet", "Enerji", "Isı ve Sıcaklık", "Elektrostatik", "Optik", "Dalgalar", "Modern Fizik"]
+};
+let yksProgress = {}; // { "TYT Matematik": ["Sayılar"] }
+let pomoLog = [];
 let linksData = [];
 let inboxData = [];
 
@@ -85,8 +93,13 @@ function loadData() {
   const yData = localStorage.getItem(LS_YKS);
   if (yData) yksData = JSON.parse(yData);
 
-  const fData = localStorage.getItem(LS_FITNESS);
-  if (fData) fitnessData = JSON.parse(fData);
+  const ymData = localStorage.getItem(LS_YKS_MISTAKES);
+  if (ymData) yksMistakesData = JSON.parse(ymData);
+
+  if (ysData) yksProgress = JSON.parse(ysData);
+
+  const pmLogData = localStorage.getItem("kerotion_pomo_log");
+  if (pmLogData) pomoLog = JSON.parse(pmLogData);
 
   const lData = localStorage.getItem(LS_LINKS);
   if (lData) linksData = JSON.parse(lData);
@@ -106,7 +119,9 @@ function scheduleSave() {
     localStorage.setItem(LS_TODO, JSON.stringify(todoData));
     localStorage.setItem(LS_KANBAN, JSON.stringify(kanbanData));
     localStorage.setItem(LS_YKS, JSON.stringify(yksData));
-    localStorage.setItem(LS_FITNESS, JSON.stringify(fitnessData));
+    localStorage.setItem(LS_YKS_MISTAKES, JSON.stringify(yksMistakesData));
+    localStorage.setItem(LS_YKS_SYLLABUS, JSON.stringify(yksProgress));
+    localStorage.setItem("kerotion_pomo_log", JSON.stringify(pomoLog));
     localStorage.setItem(LS_LINKS, JSON.stringify(linksData));
     localStorage.setItem(LS_INBOX, JSON.stringify(inboxData));
   }, 400);
@@ -141,15 +156,20 @@ const DOM = {
   todoView: document.getElementById("todoView"),
   kanbanView: document.getElementById("kanbanView"),
   yksView: document.getElementById("yksView"),
-  fitnessView: document.getElementById("fitnessView"),
   linksView: document.getElementById("linksView"),
 
   btnShowInbox: document.getElementById("btnShowInbox"),
   btnShowTodo: document.getElementById("btnShowTodo"),
   btnShowKanban: document.getElementById("btnShowKanban"),
   btnShowYks: document.getElementById("btnShowYks"),
-  btnShowFitness: document.getElementById("btnShowFitness"),
   btnShowLinks: document.getElementById("btnShowLinks"),
+  
+  // YKS TABS & ELEMENTS
+  yksTabBtns: document.querySelectorAll(".yks-tab-btn"),
+  yksTabContents: document.querySelectorAll(".yks-tab-content"),
+  btnMistakeAdd: document.getElementById("btnMistakeAdd"),
+  mistakeList: document.getElementById("mistakeList"),
+  syllabusGrid: document.getElementById("syllabusGrid"),
   
   // POMODORO DOM
   pomoZoneBtn: document.getElementById("btnPomoZone"),
@@ -684,8 +704,14 @@ function attachGlobalListeners() {
   DOM.btnShowTodo.addEventListener("click", () => switchView("todo"));
   DOM.btnShowKanban.addEventListener("click", () => switchView("kanban"));
   DOM.btnShowYks.addEventListener("click", () => switchView("yks"));
-  DOM.btnShowFitness.addEventListener("click", () => switchView("fitness"));
   DOM.btnShowLinks.addEventListener("click", () => switchView("links"));
+  
+  // YKS TAB EVENTS
+  DOM.yksTabBtns.forEach(btn => {
+    btn.addEventListener("click", () => switchYksTab(btn.dataset.tab));
+  });
+  
+  DOM.btnMistakeAdd.addEventListener("click", addMistakeLog);
   
   // JOURNAL EVENTS
   document.getElementById("btnNewJournalDay").addEventListener("click", () => {
@@ -789,8 +815,11 @@ function switchView(viewName) {
   if (viewName === "inbox") renderInbox();
   if (viewName === "todo") renderTodo();
   if (viewName === "kanban") renderKanban();
-  if (viewName === "yks") renderYksBar();
-  if (viewName === "fitness") renderFitness();
+  if (viewName === "yks") {
+    renderYksBar();
+    renderMistakeVault();
+    renderSyllabusTracker();
+  }
   if (viewName === "links") renderLinks();
 }
 
@@ -1058,6 +1087,11 @@ function endPomodoro() {
     const today = getTodayDateStr();
     if(!routinesData.habits[today]) routinesData.habits[today] = {};
     routinesData.habits[today]["Pomodoro_Sayisi"] = (routinesData.habits[today]["Pomodoro_Sayisi"] || 0) + 1;
+    
+    // YKS Özel Log
+    const target = document.getElementById("pomoFocusTarget").value;
+    pomoLog.push({ date: today, time: new Date().toLocaleTimeString(), target: target });
+    
     scheduleSave();
     if(currentView === "routines") renderRoutinesGrid();
     
@@ -1309,6 +1343,16 @@ document.querySelectorAll(".kanban-col").forEach(col => {
 });
 
 // --- 12.4 YKS ANALIZ BARS (CSS) ---
+function switchYksTab(tabName) {
+  DOM.yksTabBtns.forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.tab === tabName);
+  });
+  DOM.yksTabContents.forEach(content => {
+    const isTarget = content.id === "yksTab" + tabName.charAt(0).toUpperCase() + tabName.slice(1);
+    content.classList.toggle("view-hidden", !isTarget);
+  });
+}
+
 function renderYksBar() {
   const chartEl = document.getElementById("yksChartArea");
   chartEl.innerHTML = "";
@@ -1353,6 +1397,108 @@ function renderYksBar() {
   });
 }
 
+function addMistakeLog() {
+  const lesson = document.getElementById("mistakeLesson").value.trim();
+  const subject = document.getElementById("mistakeSubject").value.trim();
+  const reason = document.getElementById("mistakeReason").value;
+  const note = document.getElementById("mistakeNote").value.trim();
+  
+  if(!lesson || !subject) { alert("Ders ve Konu alanları zorunludur!"); return; }
+  
+  yksMistakesData.push({
+    id: generateId(),
+    date: getTodayDateStr(),
+    lesson,
+    subject,
+    reason,
+    note
+  });
+  
+  document.getElementById("mistakeLesson").value = "";
+  document.getElementById("mistakeSubject").value = "";
+  document.getElementById("mistakeNote").value = "";
+  
+  scheduleSave();
+  renderMistakeVault();
+}
+
+function renderMistakeVault() {
+  const list = document.getElementById("mistakeList");
+  list.innerHTML = "";
+  
+  if (yksMistakesData.length === 0) {
+    list.innerHTML = "<tr><td colspan='6' style='text-align:center; color:var(--text-muted);'>Henüz bir hata loglanmadı.</td></tr>";
+    return;
+  }
+  
+  [...yksMistakesData].reverse().forEach(m => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${m.date}</td>
+      <td style="font-weight:700;">${m.lesson}</td>
+      <td>${m.subject}</td>
+      <td><span class="badge-reason ${m.reason.toLowerCase()}">${m.reason}</span></td>
+      <td style="font-size:12px; color:var(--text-secondary);">${m.note}</td>
+      <td><button class="todo-trash" onclick="deleteMistake('${m.id}')">🗑</button></td>
+    `;
+    list.appendChild(tr);
+  });
+}
+
+window.deleteMistake = function(id) {
+  yksMistakesData = yksMistakesData.filter(m => m.id !== id);
+  scheduleSave();
+  renderMistakeVault();
+};
+
+function renderSyllabusTracker() {
+  const grid = document.getElementById("syllabusGrid");
+  grid.innerHTML = "";
+  
+  Object.keys(yksSyllabusData).forEach(lesson => {
+    const topics = yksSyllabusData[lesson];
+    const finished = yksProgress[lesson] || [];
+    const percent = topics.length > 0 ? Math.round((finished.length / topics.length) * 100) : 0;
+    
+    const card = document.createElement("div");
+    card.className = "syllabus-card";
+    
+    card.innerHTML = `
+      <div class="syllabus-header">
+        <span class="syllabus-lesson-name">${lesson}</span>
+        <span class="syllabus-percentage">%${percent}</span>
+      </div>
+      <div class="progress-container">
+        <div class="progress-bar-fill" style="width: ${percent}%"></div>
+      </div>
+      <div class="syllabus-topics">
+        ${topics.map(topic => {
+          const isDone = finished.includes(topic);
+          return `
+            <label class="topic-item ${isDone ? 'done' : ''}">
+              <input type="checkbox" ${isDone ? 'checked' : ''} onchange="toggleTopic('${lesson}', '${topic}')" />
+              <span>${topic}</span>
+            </label>
+          `;
+        }).join('')}
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+window.toggleTopic = function(lesson, topic) {
+  if (!yksProgress[lesson]) yksProgress[lesson] = [];
+  const idx = yksProgress[lesson].indexOf(topic);
+  if (idx > -1) {
+    yksProgress[lesson].splice(idx, 1);
+  } else {
+    yksProgress[lesson].push(topic);
+  }
+  scheduleSave();
+  renderSyllabusTracker();
+};
+
 document.getElementById("btnYksAdd").addEventListener("click", () => {
   const n = document.getElementById("yksNameInput").value.trim();
   const v = parseFloat(document.getElementById("yksNetInput").value);
@@ -1363,53 +1509,6 @@ document.getElementById("btnYksAdd").addEventListener("click", () => {
     scheduleSave();
     renderYksBar();
   }
-});
-
-// --- 12.5 FITNESS & MAKRO ---
-const iCal = document.getElementById("fitnessCalInput");
-const iPro = document.getElementById("fitnessProInput");
-const iLogText = document.getElementById("fitnessLogInput");
-
-function renderFitness() {
-  iCal.value = fitnessData.cal || "";
-  iPro.value = fitnessData.pro || "";
-  
-  const hEl = document.getElementById("fitnessHistoryList");
-  hEl.innerHTML = "";
-  if(!fitnessData.log || fitnessData.log.length === 0) {
-    hEl.innerHTML = "<p style='color:var(--text-muted); font-size:12px;'>Kayıt yok.</p>";
-    return;
-  }
-  [...fitnessData.log].reverse().forEach(log => {
-    const item = document.createElement("div");
-    item.className = "fitness-log-item";
-    item.innerHTML = `
-      <div class="fitness-log-date">${log.date}</div>
-      <div class="fitness-log-stats">🔥 ${log.cal} kcal | 🥩 ${log.pro}g protein</div>
-      <div class="fitness-log-text">${log.text}</div>
-    `;
-    hEl.appendChild(item);
-  });
-}
-
-iCal.addEventListener("input", () => { fitnessData.cal = iCal.value; scheduleSave(); });
-iPro.addEventListener("input", () => { fitnessData.pro = iPro.value; scheduleSave(); });
-
-document.getElementById("btnFitnessSave").addEventListener("click", () => {
-  if(!fitnessData.log) fitnessData.log = [];
-  const text = iLogText.value.trim();
-  if(!text) { alert("Antrenman notu boş bırakılamaz!"); return; }
-  
-  fitnessData.log.push({
-    date: getTodayDateStr(),
-    cal: fitnessData.cal || 0,
-    pro: fitnessData.pro || 0,
-    text: text
-  });
-  
-  iLogText.value = "";
-  scheduleSave();
-  renderFitness();
 });
 
 // --- 12.6 LINK VAULT ---

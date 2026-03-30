@@ -28,7 +28,6 @@
           <button class="menu-item" id="btnShowTodo" title="Görevlerim">📋 Görevlerim</button>
           <button class="menu-item" id="btnShowKanban" title="Projeler (Kanban)">📌 Proje Panosu</button>
           <button class="menu-item" id="btnShowYks" title="YKS Analizi">🎯 YKS İlerleme</button>
-          <button class="menu-item" id="btnShowFitness" title="Fitness & Makro">🏋️ Fitness</button>
           <button class="menu-item" id="btnShowLinks" title="Link Kasası">🔗 Link Kasası</button>
           <button class="menu-item" id="btnShowJournal" title="Günlük">📓 Günlük</button>
           <button class="menu-item" id="btnShowRoutines" title="Disiplin">⚔️ Disiplin</button>
@@ -55,6 +54,20 @@
       </div>
       <div class="pomo-display" id="pomoTimeDisplay">25:00</div>
       <div class="pomo-status" id="pomoStatusText">Durum: Bekliyor (Seans: 0)</div>
+      
+      <!-- Hedef Seçimi -->
+      <div class="pomo-target-select">
+        <label>Çalışma Konusu</label>
+        <select id="pomoFocusTarget">
+          <option value="TYT Matematik">TYT Matematik</option>
+          <option value="AYT Matematik">AYT Matematik</option>
+          <option value="TYT Türkçe">TYT Türkçe</option>
+          <option value="AYT Fizik">AYT Fizik</option>
+          <option value="OpenRocket Tasarımı">OpenRocket Tasarımı</option>
+          <option value="Yazılım/Proje">Yazılım/Proje</option>
+          <option value="Diğer">Diğer</option>
+        </select>
+      </div>
       
       <!-- Şablonlar -->
       <div class="pomo-modes">
@@ -209,43 +222,73 @@
     <!-- YKS VIEW -->
     <div class="editor-container view-hidden" id="yksView">
       <header class="page-header">
-        <h1 class="page-title">🎯 YKS İlerleme</h1>
-        <p class="view-subtitle">Tüm netlerini kaydet ve analiz et.</p>
+        <h1 class="page-title">🎯 YKS Takip Sistemi</h1>
+        <p class="view-subtitle">Akademik ilerlemeni yönet, hatalarından ders çıkar.</p>
       </header>
-      <div class="yks-controls">
-        <input type="text" id="yksNameInput" placeholder="Deneme Adı (Örn: TYT 3D)" />
-        <input type="number" id="yksNetInput" placeholder="Net (Örn: 95.5)" step="0.25" />
-        <button id="btnYksAdd" class="btn-glow action">Ekle</button>
+
+      <div class="yks-tabs">
+        <button class="yks-tab-btn active" data-tab="analiz">📊 Analiz</button>
+        <button class="yks-tab-btn" data-tab="mistakes">📓 Hata Defteri</button>
+        <button class="yks-tab-btn" data-tab="syllabus">📚 Müfredat</button>
       </div>
-      <div class="yks-chart" id="yksChartArea">
-        <!-- CSS Barları buraya dizilecek -->
+
+      <!-- ANALIZ TAB -->
+      <div class="yks-tab-content" id="yksTabAnaliz">
+        <div class="yks-controls">
+          <input type="text" id="yksNameInput" placeholder="Deneme Adı (Örn: TYT 3D)" />
+          <input type="number" id="yksNetInput" placeholder="Net" step="0.25" />
+          <button id="btnYksAdd" class="btn-glow action">Ekle</button>
+        </div>
+        <div class="yks-chart" id="yksChartArea">
+          <!-- CSS Barları buraya dizilecek -->
+        </div>
+      </div>
+
+      <!-- MISTAKES TAB -->
+      <div class="yks-tab-content view-hidden" id="yksTabMistakes">
+        <div class="mistake-input-group">
+          <div class="mistake-row">
+            <input type="text" id="mistakeLesson" placeholder="Ders" />
+            <input type="text" id="mistakeSubject" placeholder="Konu" />
+            <select id="mistakeReason">
+              <option value="Bilgi">Bilgi Eksikliği</option>
+              <option value="Dikkat">Dikkat Hatası</option>
+              <option value="Süre">Süre Sorunu</option>
+            </select>
+          </div>
+          <div class="mistake-row">
+            <textarea id="mistakeNote" placeholder="Kısa not (Nerede hata yaptın?)" rows="2"></textarea>
+            <button id="btnMistakeAdd" class="btn-glow action">Logla</button>
+          </div>
+        </div>
+        
+        <div class="mistake-table-wrapper">
+          <table class="mistake-table">
+            <thead>
+              <tr>
+                <th>Tarih</th>
+                <th>Ders</th>
+                <th>Konu</th>
+                <th>Sebep</th>
+                <th>Not</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="mistakeList">
+              <!-- JS Dolduracak -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- SYLLABUS TAB -->
+      <div class="yks-tab-content view-hidden" id="yksTabSyllabus">
+        <div class="syllabus-grid" id="syllabusGrid">
+          <!-- JS Dolduracak (Ders Kartları & Progress Bar) -->
+        </div>
       </div>
     </div>
 
-    <!-- FITNESS VIEW -->
-    <div class="editor-container view-hidden" id="fitnessView">
-      <header class="page-header">
-        <h1 class="page-title">🏋️ Fitness Makro</h1>
-        <p class="view-subtitle">Günlük kalori, protein ve log takibi.</p>
-      </header>
-      <div class="fitness-dashboard">
-        <div class="fitness-card">
-          <label>🔥 Kalori (kcal)</label>
-          <input type="number" id="fitnessCalInput" placeholder="Örn: 2500" />
-        </div>
-        <div class="fitness-card">
-          <label>🥩 Protein (g)</label>
-          <input type="number" id="fitnessProInput" placeholder="Örn: 150" />
-        </div>
-      </div>
-      <div class="fitness-log">
-        <label>Antrenman Notu (Günlük Log)</label>
-        <textarea id="fitnessLogInput" rows="4" placeholder="Bugün neler çalıştın?"></textarea>
-      </div>
-      <button id="btnFitnessSave" class="btn-glow success" style="margin-top:16px;">Bugünü Kaydet</button>
-      
-      <h3 style="margin-top:32px; font-size: 16px; color: var(--text-secondary);">Fitness Geçmişi</h3>
-      <div class="fitness-history" id="fitnessHistoryList"></div>
     </div>
 
     <!-- LINKS VIEW -->
