@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kerotion — Workspace</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ========== SIDEBAR ========== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <span class="sidebar-logo">📝</span>
+      <h1 class="sidebar-title">Kerotion</h1>
+      <button class="sidebar-toggle" id="sidebarToggle" title="Kenar çubuğunu kapat">‹</button>
+    </div>
+
+    <div class="sidebar-scrollable">
+      <!-- YENİ Kategori: ANA MENÜ -->
+      <div class="sidebar-section">
+        <div class="sidebar-section-header">
+          <span>Menü</span>
+        </div>
+        <nav class="main-menu" id="mainMenu">
+          <button class="menu-item active" id="btnShowPages" title="Sayfalar">📄 Sayfalar</button>
+          <button class="menu-item" id="btnShowJournal" title="Günlük">📓 Günlük</button>
+          <button class="menu-item" id="btnShowRoutines" title="Disiplin">⚔️ Disiplin</button>
+        </nav>
+      </div>
+
+      <!-- Sayfalar -->
+      <div class="sidebar-section" id="pagesSection">
+        <div class="sidebar-section-header">
+          <span>Sayfalar</span>
+          <button class="btn-add-page" id="btnAddRootPage" title="Yeni Sayfa Oluştur">+</button>
+        </div>
+        <nav class="page-tree" id="pageTree">
+          <!-- JS tarafından doldurulur -->
+        </nav>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Sidebar kapalıyken aç butonu -->
+  <button class="sidebar-open-btn" id="sidebarOpenBtn" title="Kenar çubuğunu aç">📝</button>
+
+  <!-- ========== ANA EDITOR ========== -->
+  <main class="editor-wrapper" id="editorWrapper">
+    
+    <!-- PAGES VIEW (Mevcut Editör) -->
+    <div class="editor-container view-active" id="pageView">
+      <!-- Sayfa Üst Bilgisi -->
+      <header class="page-header" id="pageHeader">
+        <textarea class="page-title" id="pageTitle" placeholder="Sayfa Başlığı" rows="1" spellcheck="false"></textarea>
+      </header>
+
+      <!-- BLOK ALANI -->
+      <div class="blocks-container" id="blocksContainer">
+        <!-- JS tarafından doldurulur -->
+      </div>
+    </div>
+
+    <!-- JOURNAL VIEW (GÜNLÜK) -->
+    <div class="editor-container view-hidden" id="journalView">
+      <header class="page-header">
+        <h1 class="page-title">Günlük</h1>
+        <p class="view-subtitle">Geçmiş düşüncelerin, hedeflerin ve değerlendirmelerin.</p>
+      </header>
+      
+      <div class="journal-controls">
+        <button id="btnNewJournalDay" class="btn-glow">Bugün İçin Yeni Kayıt</button>
+      </div>
+      
+      <div id="journalList" class="journal-list">
+        <!-- JS Dolduracak (Geçmiş günler) -->
+      </div>
+      
+      <div id="journalEditor" class="journal-editor view-hidden">
+        <button id="btnBackToJournalList" class="btn-back">← Geri Dön</button>
+        <h2 id="journalCurrentDate" class="journal-date"></h2>
+        
+        <textarea id="journalNotes" class="journal-textarea" placeholder="Bugün neler hissettin, neler yaşadın? İçini dök..."></textarea>
+        
+        <div class="journal-evaluation">
+          <h3>Günün Değerlendirmesi</h3>
+          <div class="eval-group">
+            <label>Bugün ne öğrendim?</label>
+            <textarea id="journalLearned" class="journal-eval-input" rows="2" placeholder="Basit ama kritik bir bilgi..."></textarea>
+          </div>
+          <div class="eval-group">
+            <label>Neyi daha iyi yapabilirdim?</label>
+            <textarea id="journalBetter" class="journal-eval-input" rows="2" placeholder="Yarınki gelişim noktam..."></textarea>
+          </div>
+        </div>
+        
+        <button id="btnSaveJournal" class="btn-glow success">Kaydet</button>
+      </div>
+    </div>
+
+    <!-- ROUTINES VIEW (DİSİPLİN) -->
+    <div class="editor-container view-hidden" id="routinesView">
+      <header class="page-header">
+        <h1 class="page-title">Disiplin & Rutinler</h1>
+        <p class="view-subtitle">Zinciri kırma. İstikrar, yetenekten üstündür.</p>
+      </header>
+      
+      <div class="routines-controls">
+         <input type="text" id="newRoutineInput" placeholder="Yeni rutin ekle (Örn: Fitness)" />
+         <button id="btnAddRoutine" class="btn-glow action">Ekle</button>
+      </div>
+      
+      <div class="routines-table-wrapper" id="routinesTableWrapper">
+        <!-- JS Dolduracak (Tablo grid) -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ========== SLASH MENÜ MODAL ========== -->
+  <div class="slash-menu" id="slashMenu" style="display: none;">
+    <div class="slash-menu-header">Temel Bloklar</div>
+    <ul class="slash-menu-list" id="slashMenuList">
+      <li class="slash-menu-item active" data-type="p"><span class="slash-icon">¶</span>Metin (Text)</li>
+      <li class="slash-menu-item" data-type="h1"><span class="slash-icon">H1</span>Başlık 1</li>
+      <li class="slash-menu-item" data-type="h2"><span class="slash-icon">H2</span>Başlık 2</li>
+      <li class="slash-menu-item" data-type="h3"><span class="slash-icon">H3</span>Başlık 3</li>
+      <li class="slash-menu-item" data-type="ul"><span class="slash-icon">•</span>Maddeli Liste</li>
+      <li class="slash-menu-item" data-type="todo"><span class="slash-icon">☑</span>Yapılacaklar</li>
+    </ul>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
