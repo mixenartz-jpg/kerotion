@@ -91,8 +91,31 @@ class KerotionDB {
 const DB = new KerotionDB();
 DB.init();
 
+// YKS 11. Sınıf Müfredat Verisi (Varsayılan)
+const yksSyllabusData = {
+  "Matematik": [
+    "Trigonometri", "Analitik Geometri", "Fonksiyonlarda Uygulamalar", 
+    "Denklem ve Eşitsizlik Sistemleri", "Çember ve Daire", "Uzay Geometri", "Olasılık"
+  ],
+  "Fizik": [
+    "Vektörler", "Bağıl Hareket", "Newton’ın Hareket Yasaları", "Bir Boyutta Sabit İvmeli Hareket",
+    "İki Boyutta Hareket", "Enerji ve Hareket", "İtme ve Çizgisel Momentum", "Tork", "Denge", "Elektriksel Kuvvet ve Alan"
+  ],
+  "Kimya": [
+    "Modern Atom Teorisi", "Gazlar", "Sıvı Çözeltiler ve Çözünürlük", 
+    "Kimyasal Tepkimelerde Enerji", "Kimyasal Tepkimelerde Hız", "Kimyasal Tepkimelerde Denge"
+  ],
+  "Biyoloji": [
+    "Denetleyici ve Düzenleyici Sistemler", "Duyu Organları", "Destek ve Hareket Sistemi",
+    "Sindirim Sistemi", "Dolaşım Sistemleri", "Solunum Sistemi", "Üriner Sistem", "Üreme Sistemi ve Embriyonik Gelişim"
+  ],
+  "Türkçe": [
+    "Paragrafta Anlam", "Cümlenin Öğeleri", "Yazım Kuralları", "Noktalama İşaretleri",
+    "Sözcük Türleri", "Fiiller", "Anlatım Bozuklukları"
+  ]
+};
+
 // Maintain legacy references for minimal breakage during refactor
-// These will be phasing out as I update the rest of the functions
 let activePageId = DB.pages.length > 0 ? DB.pages[0].id : null;
 let currentView = "pages";
 let activeJournalDate = null;
@@ -124,57 +147,64 @@ const DOM = {
 };
 
 function refreshDOM() {
-  DOM.sidebarToggle = document.getElementById("sidebarToggle");
-  DOM.sidebarOpenBtn = document.getElementById("sidebarOpenBtn");
-  DOM.sidebar = document.getElementById("sidebar");
-  DOM.btnAddRootPage = document.getElementById("btnAddRootPage");
-  DOM.pageTree = document.getElementById("pageTree");
-  DOM.pageTitle = document.getElementById("pageTitle");
-  DOM.blocksContainer = document.getElementById("blocksContainer");
-  DOM.slashMenu = document.getElementById("slashMenu");
-  DOM.slashMenuList = document.getElementById("slashMenuList");
-  DOM.pageView = document.getElementById("pageView");
-  DOM.journalView = document.getElementById("journalView");
-  DOM.routinesView = document.getElementById("routinesView");
-  DOM.btnShowPages = document.getElementById("btnShowPages");
-  DOM.btnShowJournal = document.getElementById("btnShowJournal");
-  DOM.btnShowRoutines = document.getElementById("btnShowRoutines");
-  DOM.inboxView = document.getElementById("inboxView");
-  DOM.todoView = document.getElementById("todoView");
-  DOM.kanbanView = document.getElementById("kanbanView");
-  DOM.yksView = document.getElementById("yksView");
-  DOM.linksView = document.getElementById("linksView");
-  DOM.btnShowInbox = document.getElementById("btnShowInbox");
-  DOM.btnShowTodo = document.getElementById("btnShowTodo");
-  DOM.btnShowKanban = document.getElementById("btnShowKanban");
-  DOM.btnShowYks = document.getElementById("btnShowYks");
-  DOM.btnShowLinks = document.getElementById("btnShowLinks");
+  const get = (id) => document.getElementById(id);
+
+  DOM.sidebarToggle = get("sidebarToggle");
+  DOM.sidebarOpenBtn = get("sidebarOpenBtn");
+  DOM.sidebar = get("sidebar");
+  DOM.btnAddRootPage = get("btnAddRootPage");
+  DOM.pageTree = get("pageTree");
+  DOM.pageTitle = get("pageTitle");
+  DOM.blocksContainer = get("blocksContainer");
+  DOM.slashMenu = get("slashMenu");
+  DOM.slashMenuList = get("slashMenuList");
+  DOM.pageView = get("pageView");
+  DOM.journalView = get("journalView");
+  DOM.routinesView = get("routinesView");
+  DOM.btnShowPages = get("btnShowPages");
+  DOM.btnShowJournal = get("btnShowJournal");
+  DOM.btnShowRoutines = get("btnShowRoutines");
+  DOM.inboxView = get("inboxView");
+  DOM.todoView = get("todoView");
+  DOM.kanbanView = get("kanbanView");
+  DOM.yksView = get("yksView");
+  DOM.linksView = get("linksView");
+  DOM.btnShowInbox = get("btnShowInbox");
+  DOM.btnShowTodo = get("btnShowTodo");
+  DOM.btnShowKanban = get("btnShowKanban");
+  DOM.btnShowYks = get("btnShowYks");
+  DOM.btnShowLinks = get("btnShowLinks");
   DOM.yksTabBtns = document.querySelectorAll(".yks-tab-btn");
   DOM.yksTabContents = document.querySelectorAll(".yks-tab-content");
-  DOM.btnMistakeAdd = document.getElementById("btnMistakeAdd");
-  DOM.mistakeList = document.getElementById("mistakeList");
-  DOM.syllabusGrid = document.getElementById("syllabusGrid");
-  DOM.pomoZoneBtn = document.getElementById("btnPomoZone");
-  DOM.pomoTimeDisplay = document.getElementById("pomoTimeDisplay");
-  DOM.pomoStatusText = document.getElementById("pomoStatusText");
+  DOM.btnMistakeAdd = get("btnMistakeAdd");
+  DOM.mistakeList = get("mistakeList");
+  DOM.syllabusGrid = get("syllabusGrid");
+  DOM.pomoZoneBtn = get("btnPomoZone");
+  DOM.pomoTimeDisplay = get("pomoTimeDisplay");
+  DOM.pomoStatusText = get("pomoStatusText");
   DOM.pomoModes = document.querySelectorAll(".pomo-mode");
-  DOM.pomoPlayPause = document.getElementById("pomoPlayPause");
-  DOM.pomoReset = document.getElementById("pomoReset");
-  DOM.btnPomoSettings = document.getElementById("btnPomoSettings");
-  DOM.pomoSettingsPanel = document.getElementById("pomoSettingsPanel");
-  DOM.pomoCustomWork = document.getElementById("pomoCustomWork");
-  DOM.pomoCustomBreak = document.getElementById("pomoCustomBreak");
-  DOM.pomoApplyCustom = document.getElementById("btnPomoApplyCustom");
-  DOM.pomoTargetSelect = document.getElementById("pomoTargetSelect");
+  DOM.pomoPlayPause = get("pomoPlayPause");
+  DOM.pomoReset = get("pomoReset");
+  DOM.btnPomoSettings = get("btnPomoSettings");
+  DOM.pomoSettingsPanel = get("pomoSettingsPanel");
+  DOM.pomoCustomWork = get("pomoCustomWork");
+  DOM.pomoCustomBreak = get("pomoCustomBreak");
+  DOM.pomoApplyCustom = get("btnPomoApplyCustom");
+  DOM.pomoTargetSelect = get("pomoTargetSelect");
   
-  DOM.btnShowMistakes = document.getElementById("btnShowMistakes");
-  DOM.btnShowSyllabus = document.getElementById("btnShowSyllabus");
+  DOM.btnShowMistakes = get("btnShowMistakes");
+  DOM.btnShowSyllabus = get("btnShowSyllabus");
   
-  DOM.theZone = document.getElementById("theZone");
-  DOM.btnZoneExit = document.getElementById("btnZoneExit");
-  DOM.blockContextMenu = document.getElementById("blockContextMenu");
-  DOM.btnDeleteBlock = document.getElementById("btnDeleteBlock");
+  DOM.theZone = get("theZone");
+  DOM.btnZoneExit = get("btnZoneExit");
+  DOM.blockContextMenu = get("blockContextMenu");
+  DOM.btnDeleteBlock = get("btnDeleteBlock");
   DOM.contextColors = document.querySelectorAll(".color-badge");
+  
+  // Verify critical elements to avoid breaking early
+  if (!DOM.sidebar || !DOM.pageView) {
+     console.warn("RefreshDOM: Essential UI components missing.");
+  }
 }
 
 let slashMenuState = {
@@ -798,7 +828,7 @@ function init() {
   try {
     console.log("Initializing Kerotion...");
     refreshDOM();
-    loadData();
+    // Removed old loadData() call as state is managed by KerotionDB.init()
     attachGlobalListeners();
     renderTree();
     if (activePageId) {
@@ -1142,19 +1172,26 @@ function endPomodoro() {
   if (pomoState === "work") {
     notifyPomoEnd(true);
     pomoCycleCount++;
-    const today = getTodayDateStr();
-    if(!routinesData.habits[today]) routinesData.habits[today] = {};
-    routinesData.habits[today]["Pomodoro_Sayisi"] = (routinesData.habits[today]["Pomodoro_Sayisi"] || 0) + 1;
-    
-    // YKS Özel Log
-    const target = document.getElementById("pomoFocusTarget").value;
-    pomoLog.push({ date: today, time: new Date().toLocaleTimeString(), target: target });
-    
-    scheduleSave();
-    if(currentView === "routines") renderRoutinesGrid();
     
     pomoState = "break";
     pomoTimeLeft = pomoBreakMins * 60;
+    
+    // AUTO-LOG POMODORO
+    const today = getTodayDateStr();
+    const target = document.getElementById("pomoFocusTarget").value;
+    DB.state.pomoLog.push({ 
+      date: today, 
+      time: new Date().toLocaleTimeString(), 
+      target: target,
+      duration: pomoWorkMins 
+    });
+    
+    // Update Routines (Pomodoro_Sayisi)
+    if (!DB.state.routines.habits[today]) DB.state.routines.habits[today] = {};
+    DB.state.routines.habits[today]["Pomodoro_Sayisi"] = (DB.state.routines.habits[today]["Pomodoro_Sayisi"] || 0) + 1;
+    
+    scheduleSave();
+    if(currentView === "routines") renderRoutinesGrid();
   } else if (pomoState === "break") {
     notifyPomoEnd(false);
     pomoState = "work";
