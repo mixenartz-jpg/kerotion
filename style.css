@@ -95,15 +95,15 @@ body {
   min-width: var(--sidebar-width);
   height: 100vh;
   background: var(--sidebar-bg);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   transition: transform var(--transition), min-width var(--transition), width var(--transition);
   z-index: 100;
   overflow: hidden;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+  box-shadow: 4px 0 20px rgba(0,0,0,0.4);
 }
 
 .sidebar.hidden {
@@ -178,28 +178,99 @@ body {
 }
 .sidebar-open-btn.visible { display: flex; }
 
-/* Sidebar Tree */
+/* Sidebar Scrollable Section */
 .sidebar-scrollable {
   flex: 1;
-  overflow-y: auto;
-  padding: 0 12px 24px;
+  overflow-y: overlay; /* Better look on some browsers */
+  overflow-x: hidden;
+  padding: 12px 8px;
 }
-.sidebar-scrollable::-webkit-scrollbar { width: 4px; }
-.sidebar-scrollable::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+.sidebar-scrollable::-webkit-scrollbar { width: 3px; }
+.sidebar-scrollable::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); border-radius: 10px; }
 
-.sidebar-section {
-  margin-top: 16px;
+/* Accordion Design */
+.sidebar-accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
-.sidebar-section-header {
+
+.sidebar-group {
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: all var(--transition);
+}
+
+.sidebar-group-header {
+  list-style: none; /* Remove default marker */
+  padding: 10px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 4px 8px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
+  user-select: none;
+  transition: all var(--transition);
   letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.sidebar-group-header::-webkit-details-marker { display: none; }
+
+.sidebar-group-header:hover {
+  color: var(--text-primary);
+  background: var(--hover-bg);
+}
+
+.sidebar-group-header::after {
+  content: '›';
+  font-size: 14px;
+  transition: transform 0.2s;
+  color: var(--text-muted);
+}
+
+.sidebar-group[open] .sidebar-group-header::after {
+  transform: rotate(90deg);
+  color: var(--accent);
+}
+
+.sidebar-group-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 0 8px 8px;
+}
+
+/* Menu Items inside Content */
+.menu-item {
+  width: 100%;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  padding: 8px 12px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  text-align: left;
+  font-size: 13.5px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all var(--transition);
+}
+
+.menu-item:hover {
+  background: var(--hover-bg);
+  color: var(--text-primary);
+  padding-left: 16px;
+}
+
+.menu-item.active {
+  background: var(--accent-light);
+  color: var(--accent);
+  border-color: rgba(139, 92, 246, 0.2);
+  font-weight: 600;
 }
 .btn-add-page {
   background: transparent;
@@ -924,110 +995,124 @@ textarea.page-title {
 
 /* ---------- 8. POMODORO, DRAG & DROP, CONTEXT MENU ---------- */
 
-/* Pomodoro UI */
-.sidebar-pomodoro {
-  margin-top: auto;
+/* ---------- 11. POMODORO UI (SIDEBAR FOOTER) ---------- */
+.sidebar-footer {
   border-top: 1px solid var(--border);
-  padding: 16px;
-  background: rgba(0,0,0,0.2);
+  padding: 16px 12px;
+  background: rgba(10, 10, 12, 0.95);
+  backdrop-filter: blur(10px);
 }
+
+.sidebar-pomodoro {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .pomo-header {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
+
+.pomo-display {
+  font-family: var(--font-mono);
+  font-size: 32px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-primary);
+  text-shadow: var(--accent-glow);
+  padding: 4px 0;
+}
+
+.pomo-status {
+  font-size: 11px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.pomo-controls {
+  display: flex;
+  gap: 8px;
+}
+
+.pomo-btn {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pomo-btn.play { background: var(--accent); color: white; border: none; }
+.pomo-btn.play:hover { filter: brightness(1.1); box-shadow: var(--accent-glow); }
+.pomo-btn:not(.play):hover { background: var(--hover-bg); }
+
+.pomo-settings-panel {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pomo-modes {
+  display: flex;
+  gap: 4px;
+}
+.pomo-mode {
+  flex: 1;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid transparent;
+  color: var(--text-secondary);
+  font-size: 10px;
+  padding: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.pomo-mode.active {
+  background: var(--accent-light);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.pomo-target-select {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pomo-target-select label { font-size: 10px; color: var(--text-muted); }
+.pomo-target-select select {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 4px;
+  border-radius: 4px;
+  font-size: 11px;
+}
+
 .pomo-zone-btn {
   background: transparent;
   border: none;
   color: var(--text-muted);
   cursor: pointer;
-  font-size: 16px;
-  line-height: 1;
-  transition: all 0.2s;
+  transition: color 0.2s;
 }
-.pomo-zone-btn:hover {
-  color: var(--cyan);
-  text-shadow: var(--cyan-glow);
-  transform: scale(1.1);
-}
-.pomo-display {
-  font-family: var(--font-mono);
-  font-size: 32px;
-  font-weight: 800;
-  color: var(--cyan);
-  text-shadow: var(--cyan-glow);
-  text-align: center;
-  margin-bottom: 4px;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 2px;
-}
-.pomo-target-select {
-  margin-bottom: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.pomo-target-select label {
-  font-size: 9px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 700;
-}
-.pomo-target-select select {
-  background: rgba(0,0,0,0.3);
-  border: 1px solid var(--border);
-  color: var(--text-primary);
-  border-radius: 4px;
-  padding: 6px;
-  font-family: var(--font-ui);
-  font-size: 12px;
-  outline: none;
-  transition: all 0.2s;
-  cursor: pointer;
-}
-.pomo-target-select select:focus {
-  border-color: var(--cyan);
-  box-shadow: var(--cyan-glow);
-}
-.pomo-status {
-  text-align: center;
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--text-muted);
-  margin-bottom: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-.pomo-modes {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 12px;
-}
-.pomo-mode {
-  flex: 1;
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  font-size: 10px;
-  padding: 4px 0;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-weight: 600;
-}
-.pomo-mode.active, .pomo-mode:hover {
-  background: var(--cyan);
-  color: #000;
-  border-color: var(--cyan);
-  box-shadow: var(--cyan-glow);
-}
+.pomo-zone-btn:hover { color: var(--accent); }
 
 /* Accordion Custom Times */
 .pomo-custom-details {

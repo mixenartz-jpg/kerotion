@@ -12,89 +12,98 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <img src="./logo.png" alt="Kerotion" class="sidebar-logo-img" />
-      <h1 class="sidebar-title">Kerotion</h1>
+      <h1 class="sidebar-title">Kerotion V2</h1>
       <button class="sidebar-toggle" id="sidebarToggle" title="Kenar çubuğunu kapat">‹</button>
     </div>
 
     <div class="sidebar-scrollable">
-      <!-- YENİ Kategori: ANA MENÜ -->
-      <div class="sidebar-section">
-        <div class="sidebar-section-header">
-          <span>Menü</span>
-        </div>
-        <nav class="main-menu" id="mainMenu">
-          <button class="menu-item active" id="btnShowPages" title="Sayfalar">📄 Sayfalar</button>
-          <button class="menu-item" id="btnShowInbox" title="Zihin Çöplüğü">📥 Inbox</button>
-          <button class="menu-item" id="btnShowTodo" title="Görevlerim">📋 Görevlerim</button>
-          <button class="menu-item" id="btnShowKanban" title="Projeler (Kanban)">📌 Proje Panosu</button>
-          <button class="menu-item" id="btnShowYks" title="YKS Analizi">🎯 YKS İlerleme</button>
-          <button class="menu-item" id="btnShowLinks" title="Link Kasası">🔗 Link Kasası</button>
-          <button class="menu-item" id="btnShowJournal" title="Günlük">📓 Günlük</button>
-          <button class="menu-item" id="btnShowRoutines" title="Disiplin">⚔️ Disiplin</button>
-        </nav>
-      </div>
+      <div class="sidebar-accordion">
+        
+        <!-- GENEL / ANA -->
+        <details class="sidebar-group" open>
+          <summary class="sidebar-group-header">🏠 ANA MERKEZ</summary>
+          <nav class="sidebar-group-content">
+            <button class="menu-item active" id="btnShowPages" title="Sayfalar">📄 Çalışma Alanı</button>
+          </nav>
+        </details>
 
-      <!-- Sayfalar -->
-      <div class="sidebar-section" id="pagesSection">
-        <div class="sidebar-section-header">
-          <span>Sayfalar</span>
-          <button class="btn-add-page" id="btnAddRootPage" title="Yeni Sayfa Oluştur">+</button>
-        </div>
-        <nav class="page-tree" id="pageTree">
-          <!-- JS tarafından doldurulur -->
-        </nav>
+        <!-- YKS MERKEZİ -->
+        <details class="sidebar-group" open>
+          <summary class="sidebar-group-header">🎯 YKS MERKEZİ</summary>
+          <nav class="sidebar-group-content">
+            <button class="menu-item" id="btnShowYks" title="Deneme Analizleri">📊 Deneme Analizi</button>
+            <button class="menu-item" id="btnShowMistakes" title="Hata Defteri">📓 Hata Defteri</button>
+            <button class="menu-item" id="btnShowSyllabus" title="Müfredat Takibi">📚 Müfredat Takibi</button>
+          </nav>
+        </details>
+
+        <!-- YAŞAM & VERİMLİLİK -->
+        <details class="sidebar-group" open>
+          <summary class="sidebar-group-header">⚡ YAŞAM & VERİMLİLİK</summary>
+          <nav class="sidebar-group-content">
+            <button class="menu-item" id="btnShowJournal" title="Günlük">📓 Kişisel Günlük</button>
+            <button class="menu-item" id="btnShowRoutines" title="Disiplin">⚔️ Rutin Takibi</button>
+            <button class="menu-item" id="btnShowTodo" title="Görevlerim">📋 Günlük Görevler</button>
+            <button class="menu-item" id="btnShowKanban" title="Projeler">📌 Proje Panosu</button>
+          </nav>
+        </details>
+
+        <!-- ARŞİV & HAVUZ -->
+        <details class="sidebar-group">
+          <summary class="sidebar-group-header">📦 ARŞİV & BİLGİ</summary>
+          <nav class="sidebar-group-content">
+            <button class="menu-item" id="btnShowInbox" title="Zihin Çöplüğü">📥 Inbox / Brain Dump</button>
+            <button class="menu-item" id="btnShowLinks" title="Link Kasası">🔗 Link Kasası</button>
+          </nav>
+        </details>
+
+        <!-- SİSTEM SAYFALARI -->
+        <details class="sidebar-group" open>
+          <summary class="sidebar-group-header">
+            <span>📄 SAYFALAR</span>
+            <button class="btn-add-page" id="btnAddRootPage" title="Yeni Sayfa">+</button>
+          </summary>
+          <nav class="page-tree" id="pageTree">
+            <!-- JS fills this -->
+          </nav>
+        </details>
+
       </div>
     </div>
 
-    <!-- YENİ: POMODORO SAYAÇ -->
-    <div class="sidebar-pomodoro" id="pomodoroContainer">
-      <div class="pomo-header">
-        <span>⏱️ Odak Merkezi</span>
-        <button id="btnPomoZone" class="pomo-zone-btn" title="Tam Ekran Modu (The Zone)">⛶</button>
-      </div>
-      <div class="pomo-display" id="pomoTimeDisplay">25:00</div>
-      <div class="pomo-status" id="pomoStatusText">Durum: Bekliyor (Seans: 0)</div>
-      
-      <!-- Hedef Seçimi -->
-      <div class="pomo-target-select">
-        <label>Çalışma Konusu</label>
-        <select id="pomoFocusTarget">
-          <option value="TYT Matematik">TYT Matematik</option>
-          <option value="AYT Matematik">AYT Matematik</option>
-          <option value="TYT Türkçe">TYT Türkçe</option>
-          <option value="AYT Fizik">AYT Fizik</option>
-          <option value="OpenRocket Tasarımı">OpenRocket Tasarımı</option>
-          <option value="Yazılım/Proje">Yazılım/Proje</option>
-          <option value="Diğer">Diğer</option>
-        </select>
-      </div>
-      
-      <!-- Şablonlar -->
-      <div class="pomo-modes">
-        <button class="pomo-mode active" data-w="25" data-b="5" title="Derin Çalışma (25/5)">25/5</button>
-        <button class="pomo-mode" data-w="90" data-b="15" title="Maraton (90/15)">90/15</button>
-        <button class="pomo-mode" data-w="135" data-b="15" title="YKS (135/15)">135/15</button>
-      </div>
-
-      <!-- Akordiyon Serbest Süre Girişi -->
-      <details class="pomo-custom-details">
-        <summary class="pomo-custom-summary">Özel Süre Gir</summary>
-        <div class="pomo-custom-inputs">
-          <div class="pomo-custom-col">
-            <label>Çalışma (dk)</label>
-            <input type="number" id="pomoCustomWork" value="25" min="1" max="300" />
-          </div>
-          <div class="pomo-custom-col">
-            <label>Mola (dk)</label>
-            <input type="number" id="pomoCustomBreak" value="5" min="1" max="60" />
-          </div>
-          <button id="btnPomoApplyCustom" class="btn-glow-small">Uygula</button>
+    <!-- FIXED FOOTER POMODORO -->
+    <div class="sidebar-footer">
+      <div class="sidebar-pomodoro" id="pomodoroContainer">
+        <div class="pomo-header">
+          <span>⏱️ Odak Merkezi</span>
+          <button id="btnPomoZone" class="pomo-zone-btn" title="Tam Ekran Modu">⛶</button>
         </div>
-      </details>
+        <div class="pomo-display" id="pomoTimeDisplay">25:00</div>
+        <div class="pomo-status" id="pomoStatusText">Durum: Bekliyor</div>
+        
+        <div class="pomo-controls">
+          <button class="pomo-btn play" id="pomoPlayPause">▶</button>
+          <button class="pomo-btn reset" id="pomoReset">↺</button>
+          <button class="pomo-btn settings-toggle" id="btnPomoSettings" title="Ayarlar">⚙️</button>
+        </div>
 
-      <div class="pomo-controls">
-        <button class="pomo-btn play" id="pomoPlayPause" title="Başlat/Duraklat">▶</button>
-        <button class="pomo-btn reset" id="pomoReset" title="Sıfırla">↺</button>
+        <!-- Hidden settings panel -->
+        <div id="pomoSettingsPanel" class="pomo-settings-panel view-hidden">
+          <div class="pomo-modes">
+            <button class="pomo-mode active" data-w="25" data-b="5">25/5</button>
+            <button class="pomo-mode" data-w="50" data-b="10">50/10</button>
+            <button class="pomo-mode" data-w="90" data-b="15">90/15</button>
+          </div>
+          <div class="pomo-target-select">
+            <label>Konu:</label>
+            <select id="pomoFocusTarget">
+              <option value="Genel">Genel</option>
+              <option value="TYT">TYT</option>
+              <option value="AYT">AYT</option>
+              <option value="Proje">Proje</option>
+            </select>
+          </div>
+        </div>
       </div>
     </div>
   </aside>

@@ -4,133 +4,118 @@
    Vanilla JS, No-Framework
    ============================================================ */
 
-/* ---------- 1. STATE & STORAGE ---------- */
-const LS_KEY = "kerotion_data";
-const LS_JOURNAL = "kerotion_journal";
-const LS_ROUTINES = "kerotion_routines";
+/* ---------- 1. DATA LAYER (KEROTION DB) ---------- */
 
-const DEFAULT_DATA = [
-  {
-    id: "page-1",
-    title: "İlk Sayfam",
-    parentId: null,
-    isOpen: true,
-    blocks: [
-      { id: "b1", type: "h1", content: "Kerotion'a Hoş Geldiniz!" },
-      { id: "b2", type: "p", content: "Burası sizin blok tabanlı yeni dijital çalışma alanınız." },
-      { id: "b3", type: "todo", content: "Slash (/) komutunu kullanarak yeni bloklar eklemeyi deneyin.", isChecked: false }
-    ]
+class KerotionDB {
+  constructor() {
+    this.keys = {
+      pages: "kerotion_data",
+      journal: "kerotion_journal",
+      routines: "kerotion_routines",
+      todo: "kerotion_todo",
+      kanban: "kerotion_kanban",
+      yks: "kerotion_yks",
+      yksMistakes: "kerotion_yks_mistakes",
+      yksProgress: "kerotion_yks_syllabus",
+      pomoLog: "kerotion_pomo_log",
+      links: "kerotion_links",
+      inbox: "kerotion_inbox"
+    };
+    this.state = {};
+    this.saveTimer = null;
   }
-];
 
-function generateId() {
-  return Math.random().toString(36).substr(2, 9);
+  init() {
+    Object.keys(this.keys).forEach(key => {
+      const data = localStorage.getItem(this.keys[key]);
+      this.state[key] = data ? JSON.parse(data) : this.getDefaults(key);
+    });
+  }
+
+  getDefaults(key) {
+    const defaults = {
+      pages: [
+        {
+          id: "page-1",
+          title: "İlk Sayfam",
+          parentId: null,
+          isOpen: true,
+          blocks: [
+            { id: "b1", type: "h1", content: "Kerotion'a Hoş Geldiniz!" },
+            { id: "b2", type: "p", content: "Burası sizin blok tabanlı yeni dijital çalışma alanınız." },
+            { id: "b3", type: "todo", content: "Slash (/) komutunu kullanarak yeni bloklar eklemeyi deneyin.", isChecked: false }
+          ]
+        }
+      ],
+      journal: [],
+      routines: {
+        routines: ["TYT Paragraf/Problem Çözüldü", "Günün Konu Tekrarı Yapıldı", "Kitap Okundu", "Kodlama/Proje Geliştirildi"],
+        habits: {}
+      },
+      todo: [],
+      kanban: { ideas: [], inProgress: [], done: [] },
+      yks: [],
+      yksMistakes: [],
+      yksProgress: {},
+      pomoLog: [],
+      links: [],
+      inbox: []
+    };
+    return defaults[key] || [];
+  }
+
+  save() {
+    clearTimeout(this.saveTimer);
+    this.saveTimer = setTimeout(() => {
+      Object.keys(this.keys).forEach(key => {
+        localStorage.setItem(this.keys[key], JSON.stringify(this.state[key]));
+      });
+      console.log("KerotionDB: Auto-saved.");
+    }, 400);
+  }
+
+  // Helper getters to mimic old global variables for compatibility
+  get pages() { return this.state.pages; }
+  get journal() { return this.state.journal; }
+  get routines() { return this.state.routines; }
+  get todo() { return this.state.todo; }
+  get kanban() { return this.state.kanban; }
+  get yks() { return this.state.yks; }
+  get yksMistakes() { return this.state.yksMistakes; }
+  get yksProgress() { return this.state.yksProgress; }
+  get pomoLog() { return this.state.pomoLog; }
+  get links() { return this.state.links; }
+  get inbox() { return this.state.inbox; }
 }
 
-let pages = [];
-let activePageId = null;
-let saveTimer = null;
+const DB = new KerotionDB();
+DB.init();
 
-let journalData = [];
-let routinesData = {
-  routines: ["TYT Paragraf/Problem Çözüldü", "Günün Konu Tekrarı Yapıldı", "Kitap Okundu", "Kodlama/Proje Geliştirildi"],
-  habits: {}
-};
-
-// --- SECOND BRAIN DATA ---
-const LS_TODO = "kerotion_todo";
-const LS_KANBAN = "kerotion_kanban";
-const LS_YKS = "kerotion_yks";
-const LS_YKS_MISTAKES = "kerotion_yks_mistakes";
-const LS_YKS_SYLLABUS = "kerotion_yks_syllabus";
-const LS_LINKS = "kerotion_links";
-const LS_INBOX = "kerotion_inbox";
-
-let todoData = [];
-let kanbanData = { ideas: [], inProgress: [], done: [] };
-let yksData = [];
-let yksMistakesData = [];
-let yksSyllabusData = {
-  "TYT Matematik": ["Sayılar", "Bölünebilme", "Rasyonel Sayılar", "Denklemler", "Mutlak Değer", "Üslü Sayılar", "Köklü Sayılar", "Çarpanlara Ayırma", "Oran Orantı", "Problemler", "Mantık", "Kümeler", "Fonksiyonlar"],
-  "TYT Türkçe": ["Sözcük Anlamı", "Cümle Anlamı", "Paragraf", "Ses Bilgisi", "Yazım Kuralları", "Noktalama", "Sözcük Yapısı", "Cümle Ögeleri", "Fiiller"],
-  "AYT Matematik": ["Polinomlar", "2. Dereceden Denklemler", "Karmaşık Sayılar", "Trigonometri", "Logaritma", "Diziler", "Limit", "Türev", "İntegral"],
-  "TYT/AYT Fizik": ["Fizik Bilimine Giriş", "Madde ve Özellikleri", "Hareket ve Kuvvet", "Enerji", "Isı ve Sıcaklık", "Elektrostatik", "Optik", "Dalgalar", "Modern Fizik"]
-};
-let yksProgress = {}; // { "TYT Matematik": ["Sayılar"] }
-let pomoLog = [];
-let linksData = [];
-let inboxData = [];
-
+// Maintain legacy references for minimal breakage during refactor
+// These will be phasing out as I update the rest of the functions
+let activePageId = DB.pages.length > 0 ? DB.pages[0].id : null;
 let currentView = "pages";
 let activeJournalDate = null;
 
-/* ---------- POMODORO STATE ---------- */
+// POMODORO STATE (Separated from DB as it's volatile/runtime)
 let pomoTimer = null;
 let pomoWorkMins = 25;
 let pomoBreakMins = 5;
 let pomoTimeLeft = 25 * 60;
 let pomoIsRunning = false;
-let pomoState = "idle"; // "idle", "work", "break"
+let pomoState = "idle";
 let pomoCycleCount = 0;
 
-function loadData() {
-  const data = localStorage.getItem(LS_KEY);
-  pages = data ? JSON.parse(data) : DEFAULT_DATA;
-  if (!activePageId && pages.length > 0) activePageId = pages[0].id;
-  
-  const jData = localStorage.getItem(LS_JOURNAL);
-  if (jData) journalData = JSON.parse(jData);
-  
-  const rData = localStorage.getItem(LS_ROUTINES);
-  if (rData) routinesData = JSON.parse(rData);
-
-  // Load Second Brain
-  const tData = localStorage.getItem(LS_TODO);
-  if (tData) todoData = JSON.parse(tData);
-
-  const kData = localStorage.getItem(LS_KANBAN);
-  if (kData) kanbanData = JSON.parse(kData);
-
-  const yData = localStorage.getItem(LS_YKS);
-  if (yData) yksData = JSON.parse(yData);
-
-  const ymData = localStorage.getItem(LS_YKS_MISTAKES);
-  if (ymData) yksMistakesData = JSON.parse(ymData);
-
-  const ysData = localStorage.getItem(LS_YKS_SYLLABUS);
-  if (ysData) yksProgress = JSON.parse(ysData);
-
-  const pmLogData = localStorage.getItem("kerotion_pomo_log");
-  if (pmLogData) pomoLog = JSON.parse(pmLogData);
-
-  const lData = localStorage.getItem(LS_LINKS);
-  if (lData) linksData = JSON.parse(lData);
-
-  const iData = localStorage.getItem(LS_INBOX);
-  if (iData) inboxData = JSON.parse(iData);
+function generateId() {
+  return Math.random().toString(36).substr(2, 9);
 }
 
 function scheduleSave() {
-  clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
-    localStorage.setItem(LS_KEY, JSON.stringify(pages));
-    localStorage.setItem(LS_JOURNAL, JSON.stringify(journalData));
-    localStorage.setItem(LS_ROUTINES, JSON.stringify(routinesData));
-    
-    // Save Second Brain
-    localStorage.setItem(LS_TODO, JSON.stringify(todoData));
-    localStorage.setItem(LS_KANBAN, JSON.stringify(kanbanData));
-    localStorage.setItem(LS_YKS, JSON.stringify(yksData));
-    localStorage.setItem(LS_YKS_MISTAKES, JSON.stringify(yksMistakesData));
-    localStorage.setItem(LS_YKS_SYLLABUS, JSON.stringify(yksProgress));
-    localStorage.setItem("kerotion_pomo_log", JSON.stringify(pomoLog));
-    localStorage.setItem(LS_LINKS, JSON.stringify(linksData));
-    localStorage.setItem(LS_INBOX, JSON.stringify(inboxData));
-  }, 400);
+  DB.save();
 }
 
 function getActivePage() {
-  return pages.find(p => p.id === activePageId);
+  return DB.state.pages.find(p => p.id === activePageId);
 }
 
 /* ---------- 2. DOM ELEMENTS ---------- */
@@ -173,11 +158,18 @@ function refreshDOM() {
   DOM.pomoTimeDisplay = document.getElementById("pomoTimeDisplay");
   DOM.pomoStatusText = document.getElementById("pomoStatusText");
   DOM.pomoModes = document.querySelectorAll(".pomo-mode");
+  DOM.pomoPlayPause = document.getElementById("pomoPlayPause");
+  DOM.pomoReset = document.getElementById("pomoReset");
+  DOM.btnPomoSettings = document.getElementById("btnPomoSettings");
+  DOM.pomoSettingsPanel = document.getElementById("pomoSettingsPanel");
   DOM.pomoCustomWork = document.getElementById("pomoCustomWork");
   DOM.pomoCustomBreak = document.getElementById("pomoCustomBreak");
   DOM.pomoApplyCustom = document.getElementById("btnPomoApplyCustom");
-  DOM.pomoPlayPause = document.getElementById("pomoPlayPause");
-  DOM.pomoReset = document.getElementById("pomoReset");
+  DOM.pomoTargetSelect = document.getElementById("pomoTargetSelect");
+  
+  DOM.btnShowMistakes = document.getElementById("btnShowMistakes");
+  DOM.btnShowSyllabus = document.getElementById("btnShowSyllabus");
+  
   DOM.theZone = document.getElementById("theZone");
   DOM.btnZoneExit = document.getElementById("btnZoneExit");
   DOM.blockContextMenu = document.getElementById("blockContextMenu");
@@ -212,9 +204,9 @@ function createPage(parentId = null) {
     isOpen: true,
     blocks: [{ id: generateId(), type: "p", content: "" }]
   };
-  pages.push(newPage);
+  DB.state.pages.push(newPage);
   if (parentId) {
-    const parent = pages.find(p => p.id === parentId);
+    const parent = DB.state.pages.find(p => p.id === parentId);
     if (parent) parent.isOpen = true;
   }
   scheduleSave();
@@ -225,7 +217,7 @@ function createPage(parentId = null) {
 function renderTree(parentId = null, container = DOM.pageTree) {
   if (parentId === null) container.innerHTML = "";
   
-  const children = pages.filter(p => p.parentId === parentId);
+  const children = DB.state.pages.filter(p => p.parentId === parentId);
   if (children.length === 0) return;
 
   children.forEach(page => {
@@ -235,12 +227,11 @@ function renderTree(parentId = null, container = DOM.pageTree) {
     const content = document.createElement("div");
     content.className = "tree-node-content" + (page.id === activePageId ? " active" : "");
     content.addEventListener("click", (e) => {
-      // eğer toggle veya ekle butonuna tıklanmadıysa sayfayı aç
       if (e.target.closest(".tree-toggle") || e.target.closest(".tree-add-sub")) return;
       openPage(page.id);
     });
 
-    const hasChildren = pages.some(p => p.parentId === page.id);
+    const hasChildren = DB.state.pages.some(p => p.parentId === page.id);
     
     const toggle = document.createElement("span");
     toggle.className = "tree-toggle" + (page.isOpen ? " open" : "");
@@ -700,6 +691,8 @@ function attachGlobalListeners() {
   if (DOM.btnShowTodo) DOM.btnShowTodo.addEventListener("click", () => switchView("todo"));
   if (DOM.btnShowKanban) DOM.btnShowKanban.addEventListener("click", () => switchView("kanban"));
   if (DOM.btnShowYks) DOM.btnShowYks.addEventListener("click", () => switchView("yks"));
+  if (DOM.btnShowMistakes) DOM.btnShowMistakes.addEventListener("click", () => switchView("mistakes"));
+  if (DOM.btnShowSyllabus) DOM.btnShowSyllabus.addEventListener("click", () => switchView("syllabus"));
   if (DOM.btnShowLinks) DOM.btnShowLinks.addEventListener("click", () => switchView("links"));
   
   // YKS TAB EVENTS
@@ -725,16 +718,23 @@ function attachGlobalListeners() {
   });
   
   // POMODORO EVENTS
+  if (DOM.btnPomoSettings) {
+    DOM.btnPomoSettings.addEventListener("click", () => {
+      DOM.pomoSettingsPanel.classList.toggle("view-hidden");
+    });
+  }
   DOM.pomoPlayPause.addEventListener("click", togglePomoTimer);
   DOM.pomoReset.addEventListener("click", resetPomoTimer);
   DOM.pomoModes.forEach(btn => {
     btn.addEventListener("click", () => setPomoMode(parseInt(btn.dataset.w), parseInt(btn.dataset.b)));
   });
-  DOM.pomoApplyCustom.addEventListener("click", () => {
-    const w = parseInt(DOM.pomoCustomWork.value) || 25;
-    const b = parseInt(DOM.pomoCustomBreak.value) || 5;
-    setPomoMode(w, b);
-  });
+  if (DOM.pomoApplyCustom) {
+    DOM.pomoApplyCustom.addEventListener("click", () => {
+      const w = parseInt(DOM.pomoCustomWork.value) || 25;
+      const b = parseInt(DOM.pomoCustomBreak.value) || 5;
+      setPomoMode(w, b);
+    });
+  }
   
   // THE ZONE EVENTS
   if (DOM.pomoZoneBtn) DOM.pomoZoneBtn.addEventListener("click", toggleZone);
@@ -771,7 +771,7 @@ function attachGlobalListeners() {
     const n = document.getElementById("yksNameInput").value.trim();
     const v = parseFloat(document.getElementById("yksNetInput").value);
     if (n && !isNaN(v)) {
-      yksData.push({ name: n, net: v });
+      DB.state.yks.push({ name: n, net: v });
       document.getElementById("yksNameInput").value = "";
       document.getElementById("yksNetInput").value = "";
       scheduleSave();
@@ -785,7 +785,7 @@ function attachGlobalListeners() {
     let url = urlEl.value.trim();
     if (title && url) {
       if(!url.startsWith("http")) url = "https://" + url;
-      linksData.push({ title, url });
+      DB.state.links.push({ title, url });
       document.getElementById("linkTitleInput").value = "";
       urlEl.value = "";
       scheduleSave();
@@ -810,61 +810,75 @@ function init() {
   }
 }
 
-/* ---------- 7. VIEW NAVIGATION ---------- */
-function switchView(viewName) {
-  console.log("Switching view to:", viewName);
-  currentView = viewName;
-  
-  const viewMap = {
-    "pages": "pageView",
-    "journal": "journalView",
-    "routines": "routinesView",
-    "inbox": "inboxView",
-    "todo": "todoView",
-    "kanban": "kanbanView",
-    "yks": "yksView",
-    "links": "linksView"
-  };
+/* ---------- 7. VIEW NAVIGATION (ROUTER) ---------- */
 
-  const btnMap = {
-    "pages": "btnShowPages",
-    "journal": "btnShowJournal",
-    "routines": "btnShowRoutines",
-    "inbox": "btnShowInbox",
-    "todo": "btnShowTodo",
-    "kanban": "btnShowKanban",
-    "yks": "btnShowYks",
-    "links": "btnShowLinks"
-  };
-
-  Object.keys(viewMap).forEach(v => {
-    const btn = DOM[btnMap[v]];
-    const container = DOM[viewMap[v]];
-    
-    if (btn) btn.classList.toggle("active", viewName === v);
-    if (container) {
-      if (viewName === v) {
-        container.classList.remove("view-hidden");
-        container.classList.add("view-active");
-      } else {
-        container.classList.remove("view-active");
-        container.classList.add("view-hidden");
-      }
-    }
-  });
-
-  // Render Specific Views
-  if (viewName === "yks") {
-    renderYksBar();
-    renderMistakeVault();
-    renderSyllabusTracker();
+class KerotionRouter {
+  constructor() {
+    this.viewMap = {
+      "pages": "pageView",
+      "journal": "journalView",
+      "routines": "routinesView",
+      "inbox": "inboxView",
+      "todo": "todoView",
+      "kanban": "kanbanView",
+      "yks": "yksView",
+      "mistakes": "yksView",
+      "syllabus": "yksView",
+      "links": "linksView"
+    };
   }
-  if (viewName === "links") renderLinks();
-  if (viewName === "routines") renderRoutinesGrid();
-  if (viewName === "journal") renderJournalList();
-  if (viewName === "inbox") renderInbox();
-  if (viewName === "todo") renderTodo();
-  if (viewName === "kanban") renderKanban();
+
+  switchView(viewId) {
+    console.log("Router: Switching view to:", viewId);
+    
+    // Reset state & hide all
+    document.querySelectorAll(".editor-container").forEach(el => {
+      el.classList.remove("view-active");
+      el.classList.add("view-hidden");
+    });
+
+    const targetId = this.viewMap[viewId] || viewId;
+    const targetContainer = document.getElementById(targetId);
+    if (targetContainer) {
+      targetContainer.classList.remove("view-hidden");
+      targetContainer.classList.add("view-active");
+      currentView = viewId;
+    }
+
+    // Toggle active buttons globally
+    document.querySelectorAll(".menu-item").forEach(btn => {
+      const activeId = `btnShow${viewId.charAt(0).toUpperCase() + viewId.slice(1)}`;
+      btn.classList.toggle("active", btn.id === activeId);
+    });
+
+    // Sub-navigation handling
+    if (viewId === "mistakes") switchYksTab("mistakes");
+    if (viewId === "syllabus") switchYksTab("syllabus");
+    if (viewId === "yks") switchYksTab("analiz");
+
+    // Trigger View Specific Renders
+    this._onViewLoad(viewId);
+  }
+
+  _onViewLoad(viewId) {
+    const renderFns = {
+      "yks": () => { renderYksBar(); renderMistakeVault(); renderSyllabusTracker(); },
+      "links": renderLinks,
+      "routines": renderRoutinesGrid,
+      "journal": renderJournalList,
+      "inbox": renderInbox,
+      "todo": renderTodo,
+      "kanban": renderKanban
+    };
+    if (renderFns[viewId]) renderFns[viewId]();
+  }
+}
+
+const Router = new KerotionRouter();
+
+// Compatibility function for direct calls
+function switchView(viewName) {
+  Router.switchView(viewName);
 }
 
 /* ---------- 8. JOURNAL MODULE ---------- */
@@ -884,12 +898,12 @@ function renderJournalList() {
   
   listEl.innerHTML = "";
   
-  if (journalData.length === 0) {
+  if (DB.state.journal.length === 0) {
     listEl.innerHTML = "<p style='color: var(--text-muted);'>Henüz bir günlük kaydı yok. Bugün yazmaya başla!</p>";
     return;
   }
   
-  const sorted = [...journalData].sort((a,b) => b.date.localeCompare(a.date));
+  const sorted = [...DB.state.journal].sort((a,b) => b.date.localeCompare(a.date));
   
   sorted.forEach(entry => {
     const card = document.createElement("div");
@@ -908,10 +922,10 @@ function renderJournalList() {
 function openJournalEditor(dateStr) {
   activeJournalDate = dateStr;
   
-  let entry = journalData.find(j => j.date === dateStr);
+  let entry = DB.state.journal.find(j => j.date === dateStr);
   if (!entry) {
     entry = { date: dateStr, notes: "", learned: "", better: "" };
-    journalData.push(entry);
+    DB.state.journal.push(entry);
     scheduleSave();
   }
   
@@ -927,7 +941,7 @@ function openJournalEditor(dateStr) {
 
 function saveJournalEntry() {
   if (!activeJournalDate) return;
-  const entry = journalData.find(j => j.date === activeJournalDate);
+  const entry = DB.state.journal.find(j => j.date === activeJournalDate);
   if (entry) {
     entry.notes = document.getElementById("journalNotes").value;
     entry.learned = document.getElementById("journalLearned").value;
@@ -945,7 +959,7 @@ function renderRoutinesGrid() {
   const container = document.getElementById("routinesTableWrapper");
   container.innerHTML = "";
   
-  const routines = routinesData.routines;
+  const routines = DB.state.routines.routines;
   if (routines.length === 0) {
     container.innerHTML = "<p style='color: var(--text-muted);'>Hiç rutin eklenmemiş. Önce yukarıdan rutin ekleyin.</p>";
     return;
@@ -990,7 +1004,7 @@ function renderRoutinesGrid() {
     delBtn.title = "Rutini Sil";
     delBtn.onclick = () => {
       if(confirm(`"${routine}" silinecek, emin misiniz?`)) {
-        routinesData.routines = routinesData.routines.filter(r => r !== routine);
+        DB.state.routines.routines = DB.state.routines.routines.filter(r => r !== routine);
         scheduleSave();
         renderRoutinesGrid();
       }
@@ -1004,13 +1018,13 @@ function renderRoutinesGrid() {
       const cell = document.createElement("div");
       cell.className = "rt-cell";
       
-      const isChecked = routinesData.habits[d.date] && routinesData.habits[d.date][routine];
+      const isChecked = DB.state.routines.habits[d.date] && DB.state.routines.habits[d.date][routine];
       
       const cb = document.createElement("div");
       cb.className = "rt-checkbox" + (isChecked ? " checked" : "");
       cb.onclick = () => {
-        if (!routinesData.habits[d.date]) routinesData.habits[d.date] = {};
-        routinesData.habits[d.date][routine] = !routinesData.habits[d.date][routine];
+        if (!DB.state.routines.habits[d.date]) DB.state.routines.habits[d.date] = {};
+        DB.state.routines.habits[d.date][routine] = !DB.state.routines.habits[d.date][routine];
         scheduleSave();
         cb.classList.toggle("checked");
       };
@@ -1026,8 +1040,8 @@ function renderRoutinesGrid() {
 function addRoutine() {
   const val = document.getElementById("newRoutineInput").value.trim();
   if (!val) return;
-  if (!routinesData.routines.includes(val)) {
-    routinesData.routines.push(val);
+  if (!DB.state.routines.routines.includes(val)) {
+    DB.state.routines.routines.push(val);
     scheduleSave();
     renderRoutinesGrid();
   }
@@ -1215,11 +1229,11 @@ function toggleZone() {
 function renderInbox() {
   const listEl = document.getElementById("inboxList");
   listEl.innerHTML = "";
-  if (inboxData.length === 0) {
+  if (DB.state.inbox.length === 0) {
     listEl.innerHTML = "<p style='color:var(--text-muted);'>Zihin çöplüğü temiz.</p>";
     return;
   }
-  [...inboxData].reverse().forEach((note, idx) => {
+  [...DB.state.inbox].reverse().forEach((note, idx) => {
     const item = document.createElement("div");
     item.className = "todo-item";
     
@@ -1231,7 +1245,7 @@ function renderInbox() {
     btnDel.className = "todo-trash";
     btnDel.innerHTML = "🗑";
     btnDel.onclick = () => {
-      inboxData.splice(inboxData.length - 1 - idx, 1);
+      DB.state.inbox.splice(DB.state.inbox.length - 1 - idx, 1);
       scheduleSave();
       renderInbox();
     };
@@ -1264,7 +1278,7 @@ document.addEventListener("keydown", (e) => {
 bdInput.addEventListener("keydown", (e) => {
   if (e.key === "Enter" && bdInput.value.trim() !== "") {
     e.preventDefault();
-    inboxData.push(bdInput.value.trim());
+    DB.state.inbox.push(bdInput.value.trim());
     scheduleSave();
     bdModal.classList.add("hidden");
     if(currentView === "inbox") renderInbox();
@@ -1276,11 +1290,11 @@ const todoInput = document.getElementById("todoInput");
 function renderTodo() {
   const listEl = document.getElementById("todoList");
   listEl.innerHTML = "";
-  if(todoData.length === 0) {
+  if(DB.state.todo.length === 0) {
     listEl.innerHTML = "<p style='color:var(--text-muted);'>Bugün için planlanan görev yok.</p>";
     return;
   }
-  todoData.forEach((td, idx) => {
+  DB.state.todo.forEach((td, idx) => {
     const item = document.createElement("div");
     item.className = "todo-item" + (td.done ? " checked" : "");
     
@@ -1288,7 +1302,7 @@ function renderTodo() {
     chk.type = "checkbox";
     chk.checked = td.done;
     chk.onchange = () => {
-      todoData[idx].done = chk.checked;
+      DB.state.todo[idx].done = chk.checked;
       scheduleSave();
       renderTodo();
     };
@@ -1301,7 +1315,7 @@ function renderTodo() {
     btnDel.className = "todo-trash";
     btnDel.innerHTML = "🗑";
     btnDel.onclick = () => {
-      todoData.splice(idx, 1);
+      DB.state.todo.splice(idx, 1);
       scheduleSave();
       renderTodo();
     };
@@ -1314,7 +1328,7 @@ function renderTodo() {
 }
 todoInput.addEventListener("keydown", (e) => {
   if(e.key === "Enter" && todoInput.value.trim() !== "") {
-    todoData.push({ text: todoInput.value.trim(), done: false });
+    DB.state.todo.push({ text: todoInput.value.trim(), done: false });
     todoInput.value = "";
     scheduleSave();
     renderTodo();
@@ -1330,14 +1344,14 @@ function renderKanban() {
     const colEl = document.getElementById(colId === "ideas" ? "kanbanIdeas" : colId === "inProgress" ? "kanbanProgress" : "kanbanDone");
     colEl.innerHTML = "";
     
-    kanbanData[colId].forEach((task, idx) => {
+    DB.state.kanban[colId].forEach((task, idx) => {
       const card = document.createElement("div");
       card.className = "kanban-card";
       card.draggable = true;
       card.innerHTML = `<span>${task}</span> <button class="todo-trash" style="font-size:12px;">🗑</button>`;
       
       card.querySelector("button").onclick = () => {
-        kanbanData[colId].splice(idx, 1);
+        DB.state.kanban[colId].splice(idx, 1);
         scheduleSave();
         renderKanban();
       };
@@ -1354,7 +1368,7 @@ function renderKanban() {
 function addKanbanCard() {
   const val = kInput.value.trim();
   if(val !== "") {
-    kanbanData.ideas.push(val);
+    DB.state.kanban.ideas.push(val);
     kInput.value = "";
     scheduleSave();
     renderKanban();
@@ -1378,8 +1392,8 @@ document.querySelectorAll(".kanban-col").forEach(col => {
       const data = JSON.parse(e.dataTransfer.getData("text/plain"));
       const targetColId = col.dataset.col;
       if (data.colId === targetColId) return;
-      const taskText = kanbanData[data.colId].splice(data.idx, 1)[0];
-      kanbanData[targetColId].push(taskText);
+      const taskText = DB.state.kanban[data.colId].splice(data.idx, 1)[0];
+      DB.state.kanban[targetColId].push(taskText);
       scheduleSave();
       renderKanban();
     } catch(err){}
@@ -1400,13 +1414,13 @@ function switchYksTab(tabName) {
 function renderYksBar() {
   const chartEl = document.getElementById("yksChartArea");
   chartEl.innerHTML = "";
-  if(yksData.length === 0) {
+  if(DB.state.yks.length === 0) {
     chartEl.innerHTML = "<p style='color:var(--text-muted); padding: 20px;'>Net verisi bekleniyor...</p>";
     return;
   }
   const maxNet = 120; // TYT Maximum
   
-  yksData.forEach((entry, idx) => {
+  DB.state.yks.forEach((entry, idx) => {
     const wrap = document.createElement("div");
     wrap.className = "yks-bar-wrap";
     
@@ -1428,7 +1442,7 @@ function renderYksBar() {
     
     wrap.ondblclick = () => {
       if(confirm(`"${entry.name}" denemesini silmek istiyor musunuz?`)){
-        yksData.splice(idx, 1);
+        DB.state.yks.splice(idx, 1);
         scheduleSave();
         renderYksBar();
       }
@@ -1449,7 +1463,7 @@ function addMistakeLog() {
   
   if(!lesson || !subject) { alert("Ders ve Konu alanları zorunludur!"); return; }
   
-  yksMistakesData.push({
+  DB.state.yksMistakes.push({
     id: generateId(),
     date: getTodayDateStr(),
     lesson,
@@ -1470,12 +1484,12 @@ function renderMistakeVault() {
   const list = document.getElementById("mistakeList");
   list.innerHTML = "";
   
-  if (yksMistakesData.length === 0) {
+  if (DB.state.yksMistakes.length === 0) {
     list.innerHTML = "<tr><td colspan='6' style='text-align:center; color:var(--text-muted);'>Henüz bir hata loglanmadı.</td></tr>";
     return;
   }
   
-  [...yksMistakesData].reverse().forEach(m => {
+  [...DB.state.yksMistakes].reverse().forEach(m => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${m.date}</td>
@@ -1490,7 +1504,7 @@ function renderMistakeVault() {
 }
 
 window.deleteMistake = function(id) {
-  yksMistakesData = yksMistakesData.filter(m => m.id !== id);
+  DB.state.yksMistakes = DB.state.yksMistakes.filter(m => m.id !== id);
   scheduleSave();
   renderMistakeVault();
 };
@@ -1501,7 +1515,7 @@ function renderSyllabusTracker() {
   
   Object.keys(yksSyllabusData).forEach(lesson => {
     const topics = yksSyllabusData[lesson];
-    const finished = yksProgress[lesson] || [];
+    const finished = DB.state.yksProgress[lesson] || [];
     const percent = topics.length > 0 ? Math.round((finished.length / topics.length) * 100) : 0;
     
     const card = document.createElement("div");
@@ -1532,10 +1546,10 @@ function renderSyllabusTracker() {
 }
 
 window.toggleTopic = function(lesson, topic) {
-  if (!yksProgress[lesson]) yksProgress[lesson] = [];
-  const idx = yksProgress[lesson].indexOf(topic);
-  if (idx > -1) yksProgress[lesson].splice(idx, 1);
-  else yksProgress[lesson].push(topic);
+  if (!DB.state.yksProgress[lesson]) DB.state.yksProgress[lesson] = [];
+  const idx = DB.state.yksProgress[lesson].indexOf(topic);
+  if (idx > -1) DB.state.yksProgress[lesson].splice(idx, 1);
+  else DB.state.yksProgress[lesson].push(topic);
   scheduleSave();
   renderSyllabusTracker();
 };
@@ -1546,11 +1560,11 @@ function renderLinks() {
   const grid = document.getElementById("linksGrid");
   if (!grid) return;
   grid.innerHTML = "";
-  if(linksData.length === 0) {
+  if(DB.state.links.length === 0) {
     grid.innerHTML = "<p style='color:var(--text-muted);'>Kasa boş.</p>";
     return;
   }
-  linksData.forEach((link, idx) => {
+  DB.state.links.forEach((link, idx) => {
     const card = document.createElement("a");
     card.className = "link-card";
     card.href = link.url;
@@ -1567,7 +1581,7 @@ function renderLinks() {
 }
 
 window.deleteLink = function(idx) {
-  linksData.splice(idx, 1);
+  DB.state.links.splice(idx, 1);
   scheduleSave();
   renderLinks();
 };
