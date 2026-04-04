@@ -22,7 +22,8 @@ class KerotionDB {
       yksProgress: 'kerotion_yks_syllabus',
       pomoLog:     'kerotion_pomo_log',
       links:       'kerotion_links',
-      inbox:       'kerotion_inbox'
+      inbox:       'kerotion_inbox',
+      streak:      'kerotion_streak'
     };
     this.state = {};
     this.saveTimer = null;
@@ -62,7 +63,8 @@ class KerotionDB {
       yksProgress: {},
       pomoLog:     [],
       links:       [],
-      inbox:       []
+      inbox:       [],
+      streak:      { current: 0, longest: 0, lastDate: null, history: [] }
     };
     return map[key] !== undefined ? map[key] : [];
   }
@@ -346,7 +348,8 @@ function openPage(pageId) {
 const VIEW_MAP = {
   pages: 'pageView', journal: 'journalView', routines: 'routinesView',
   inbox: 'inboxView', todo: 'todoView', kanban: 'kanbanView',
-  yks: 'yksView', mistakes: 'yksView', syllabus: 'yksView', links: 'linksView'
+  yks: 'yksView', mistakes: 'yksView', syllabus: 'yksView', links: 'linksView',
+  dashboard: 'dashboardView'
 };
 
 function switchView(viewName) {
@@ -372,9 +375,17 @@ function switchView(viewName) {
   if (activeBtn) activeBtn.classList.add('active');
 
   /* 4. YKS ic sekme */
-  if (viewName === 'mistakes') switchYksTab('mistakes');
-  else if (viewName === 'syllabus') switchYksTab('syllabus');
-  else if (viewName === 'yks') switchYksTab('analiz');
+  if (viewName === 'mistakes') {
+    switchYksTab('mistakes');
+    // Revizyon panelini hata defterinin altında göster
+    const rw = document.getElementById('revisionWrapper');
+    if (rw) { rw.classList.remove('view-hidden'); renderRevisionPanel(); }
+  } else {
+    const rw = document.getElementById('revisionWrapper');
+    if (rw) rw.classList.add('view-hidden');
+    if (viewName === 'syllabus') switchYksTab('syllabus');
+    else if (viewName === 'yks') switchYksTab('analiz');
+  }
 
   /* 5. Modul render */
   const renderMap = {
@@ -386,7 +397,8 @@ function switchView(viewName) {
     inbox:    renderInbox,
     todo:     renderTodo,
     kanban:   renderKanban,
-    links:    renderLinks
+    links:    renderLinks,
+    dashboard: renderDashboard
   };
   if (renderMap[viewName]) renderMap[viewName]();
 }
@@ -708,6 +720,7 @@ function endPomodoro() {
     if (!DB.state.routines.habits[today]) DB.state.routines.habits[today] = {};
     DB.state.routines.habits[today]['Pomodoro_Sayisi'] =
       (DB.state.routines.habits[today]['Pomodoro_Sayisi'] || 0) + 1;
+    updateStreak(today);
     scheduleSave();
     if (currentView === 'routines') renderRoutinesGrid();
     pomoState    = 'break';
@@ -1154,7 +1167,8 @@ function attachGlobalListeners() {
   const navMap = {
     btnShowPages: 'pages', btnShowJournal: 'journal', btnShowRoutines: 'routines',
     btnShowInbox: 'inbox', btnShowTodo: 'todo', btnShowKanban: 'kanban',
-    btnShowYks: 'yks', btnShowMistakes: 'mistakes', btnShowSyllabus: 'syllabus', btnShowLinks: 'links'
+    btnShowYks: 'yks', btnShowMistakes: 'mistakes', btnShowSyllabus: 'syllabus',
+    btnShowLinks: 'links', btnShowDashboard: 'dashboard'
   };
   Object.entries(navMap).forEach(([id, view]) => {
     const btn = document.getElementById(id);
@@ -1268,6 +1282,9 @@ function init() {
     renderTree();
     if (activePageId) openPage(activePageId);
     updatePomoDisplay();
+    renderStreakBadge();
+    renderQuoteOfDay();
+    renderRevisionPanel();
     console.log('Kerotion hazir.');
   } catch (err) {
     console.error('Kerotion baslama hatasi:', err);
@@ -1275,3 +1292,212 @@ function init() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
+/* ══════════════════════════════════════════════════════════════
+   22. STREAK SİSTEMİ
+   Pomodoro tamamlanınca günlük streak güncellenir.
+   ══════════════════════════════════════════════════════════════ */
+function updateStreak(today) {
+  const s = DB.state.streak;
+  if (s.lastDate === today) return; // Zaten bugün sayıldı
+
+  const yesterday = (() => {
+    const d = new Date(today); d.setDate(d.getDate() - 1);
+    return d.toISOString().split('T')[0];
+  })();
+
+  if (s.lastDate === yesterday) {
+    s.current++;
+  } else {
+    s.current = 1;
+  }
+  s.longest  = Math.max(s.longest, s.current);
+  s.lastDate = today;
+  if (!s.history.includes(today)) s.history.push(today);
+  renderStreakBadge();
+}
+
+function renderStreakBadge() {
+  const s   = DB.state.streak;
+  const el  = document.getElementById('streakBadge');
+  if (!el) return;
+  const fire = s.current >= 7 ? '🔥🔥' : s.current >= 3 ? '🔥' : '🌱';
+  el.innerHTML = `${fire} <span class="streak-count">${s.current}</span> <span class="streak-label">gün</span>`;
+  el.title = `En uzun seri: ${s.longest} gün`;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   23. ÇALIŞMA İSTATİSTİKLERİ DASHBOARD
+   ══════════════════════════════════════════════════════════════ */
+function renderDashboard() {
+  const container = document.getElementById('dashboardView');
+  if (!container) return;
+
+  const today = getTodayDateStr();
+  const last7 = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(); d.setDate(d.getDate() - (6 - i));
+    return d.toISOString().split('T')[0];
+  });
+
+  // Günlük pomodoro sayıları
+  const dailyCounts = last7.map(date => ({
+    date,
+    label: new Date(date).toLocaleDateString('tr-TR', { weekday: 'short' }),
+    count: DB.state.pomoLog.filter(l => l.date === date).length,
+    mins:  DB.state.pomoLog.filter(l => l.date === date).reduce((s, l) => s + (l.duration || 25), 0)
+  }));
+
+  const totalPomos   = DB.state.pomoLog.length;
+  const totalMins    = DB.state.pomoLog.reduce((s, l) => s + (l.duration || 25), 0);
+  const todayPomos   = DB.state.pomoLog.filter(l => l.date === today).length;
+  const maxCount     = Math.max(...dailyCounts.map(d => d.count), 1);
+
+  // Konu dağılımı
+  const targetMap = {};
+  DB.state.pomoLog.forEach(l => { targetMap[l.target || 'Genel'] = (targetMap[l.target || 'Genel'] || 0) + 1; });
+  const topTargets = Object.entries(targetMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+  container.innerHTML = `
+    <header class="page-header">
+      <h1 class="page-title">📊 Çalışma İstatistikleri</h1>
+      <p class="view-subtitle">Geçmiş performansın ve alışkanlıkların.</p>
+    </header>
+
+    <div class="dash-stats-row">
+      <div class="dash-stat-card">
+        <div class="dash-stat-value">${todayPomos}</div>
+        <div class="dash-stat-label">Bugün Pomodoro</div>
+      </div>
+      <div class="dash-stat-card accent">
+        <div class="dash-stat-value">${DB.state.streak.current}</div>
+        <div class="dash-stat-label">🔥 Günlük Seri</div>
+      </div>
+      <div class="dash-stat-card">
+        <div class="dash-stat-value">${Math.round(totalMins / 60)}</div>
+        <div class="dash-stat-label">Toplam Saat</div>
+      </div>
+      <div class="dash-stat-card">
+        <div class="dash-stat-value">${totalPomos}</div>
+        <div class="dash-stat-label">Toplam Pomodoro</div>
+      </div>
+    </div>
+
+    <div class="dash-section">
+      <h3 class="dash-section-title">Son 7 Gün — Günlük Pomodoro</h3>
+      <div class="dash-bar-chart">
+        ${dailyCounts.map(d => `
+          <div class="dash-bar-col">
+            <div class="dash-bar-wrap">
+              <div class="dash-bar" style="height:${Math.round((d.count / maxCount) * 100)}%" title="${d.count} pomodoro, ${d.mins} dk">
+                ${d.count > 0 ? `<span class="dash-bar-val">${d.count}</span>` : ''}
+              </div>
+            </div>
+            <div class="dash-bar-label">${d.label}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    ${topTargets.length ? `
+    <div class="dash-section">
+      <h3 class="dash-section-title">Konu Dağılımı</h3>
+      <div class="dash-topics">
+        ${topTargets.map(([name, cnt]) => `
+          <div class="dash-topic-row">
+            <span class="dash-topic-name">${name}</span>
+            <div class="dash-topic-bar-wrap">
+              <div class="dash-topic-bar" style="width:${Math.round((cnt / topTargets[0][1]) * 100)}%"></div>
+            </div>
+            <span class="dash-topic-cnt">${cnt} pomo</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>` : ''}
+  `;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   24. GÜNLÜK MOTİVASYON QUOTE
+   ══════════════════════════════════════════════════════════════ */
+const QUOTES = [
+  { text: "Disiplin, motivasyon kaybolduğunda devreye girer.", author: "Anonymous" },
+  { text: "Büyük başarılar küçük adımların birikmesiyle olur.", author: "Anonymous" },
+  { text: "Bugün yapabileceğini yarına bırakma.", author: "Benjamin Franklin" },
+  { text: "Başarı, her gün tekrarlanan küçük çabaların toplamıdır.", author: "Robert Collier" },
+  { text: "Zor olan doğru olandır.", author: "Anonymous" },
+  { text: "Konfor alanın dışında büyüme başlar.", author: "Anonymous" },
+  { text: "Sabır, gizli bir disiplindir.", author: "Anonymous" },
+  { text: "Hata yapmak öğreniyor olmaktır.", author: "Anonymous" },
+  { text: "Kararlılık, yeteneği geçer.", author: "Anonymous" },
+  { text: "Her gün biraz daha iyi olmak yeterli.", author: "Anonymous" },
+  { text: "Çalışmak bir seçim değil, bir kimlik meselesidir.", author: "Anonymous" },
+  { text: "Yorgunluk zayıflık değil, gelişimin kanıtıdır.", author: "Anonymous" },
+  { text: "Yarın olmaz. Bugün başlar.", author: "Anonymous" },
+  { text: "Kendinle yarış, başkasıyla değil.", author: "Anonymous" },
+  { text: "Bir saatlik odak, bir günlük dağınıklıktan değerlidir.", author: "Anonymous" }
+];
+
+function renderQuoteOfDay() {
+  const el = document.getElementById('quoteOfDay');
+  if (!el) return;
+  // Tarihe göre sabit quote (her gün aynı, her yeni gün farklı)
+  const dayIndex = Math.floor(Date.now() / 86400000) % QUOTES.length;
+  const q = QUOTES[dayIndex];
+  el.innerHTML = `
+    <div class="quote-text">"${q.text}"</div>
+    <div class="quote-author">— ${q.author}</div>
+  `;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   25. REVİZYON HATIRLATICI
+   Hata defterine eklenen konular 3, 7 ve 14 gün sonra hatırlatılır.
+   ══════════════════════════════════════════════════════════════ */
+const REVISION_INTERVALS = [3, 7, 14];
+
+function getDaysDiff(dateStr) {
+  const then = new Date(dateStr);
+  const now  = new Date();
+  return Math.floor((now - then) / 86400000);
+}
+
+function getRevisionAlerts() {
+  const alerts = [];
+  DB.state.yksMistakes.forEach(m => {
+    if (!m.date) return;
+    const diff = getDaysDiff(m.date);
+    REVISION_INTERVALS.forEach(interval => {
+      if (diff === interval) {
+        alerts.push({ ...m, daysAgo: diff, interval });
+      }
+    });
+  });
+  return alerts;
+}
+
+function renderRevisionPanel() {
+  const el = document.getElementById('revisionPanel');
+  if (!el) return;
+  const alerts = getRevisionAlerts();
+  if (!alerts.length) {
+    el.innerHTML = '<p class="revision-empty">Bugün revize edilecek konu yok. 🎉</p>';
+    return;
+  }
+  el.innerHTML = alerts.map(a => `
+    <div class="revision-card">
+      <div class="revision-badge">${a.interval}. gün</div>
+      <div class="revision-info">
+        <span class="revision-lesson">${a.lesson}</span>
+        <span class="revision-subject">${a.subject}</span>
+      </div>
+      <div class="revision-note">${a.note || ''}</div>
+    </div>
+  `).join('');
+
+  // Sidebar badge
+  const badge = document.getElementById('revisionBadge');
+  if (badge) {
+    badge.textContent = alerts.length;
+    badge.style.display = alerts.length ? 'inline-flex' : 'none';
+  }
+}

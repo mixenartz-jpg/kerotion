@@ -24,15 +24,25 @@
           <div class="sidebar-group-header" data-accordion>🏠 ANA MERKEZ</div>
           <nav class="sidebar-group-content">
             <button class="menu-item active" id="btnShowPages" title="Sayfalar">📄 Çalışma Alanı</button>
+            <button class="menu-item" id="btnShowDashboard" title="İstatistikler">📊 Dashboard</button>
           </nav>
         </div>
+
+        <!-- STREAK BANNER -->
+        <div class="streak-banner">
+          <span class="streak-label-text">Günlük Seri</span>
+          <span class="streak-badge" id="streakBadge">🌱 <span class="streak-count">0</span> <span class="streak-label">gün</span></span>
+        </div>
+
+        <!-- QUOTE -->
+        <div class="quote-banner" id="quoteOfDay"></div>
 
         <!-- YKS MERKEZİ -->
         <div class="sidebar-group open">
           <div class="sidebar-group-header" data-accordion>🎯 YKS MERKEZİ</div>
           <nav class="sidebar-group-content">
             <button class="menu-item" id="btnShowYks" title="Deneme Analizleri">📊 Deneme Analizi</button>
-            <button class="menu-item" id="btnShowMistakes" title="Hata Defteri">📓 Hata Defteri</button>
+            <button class="menu-item" id="btnShowMistakes" title="Hata Defteri">📓 Hata Defteri <span class="revision-badge-dot" id="revisionBadge" style="display:none">0</span></button>
             <button class="menu-item" id="btnShowSyllabus" title="Müfredat Takibi">📚 Müfredat Takibi</button>
           </nav>
         </div>
@@ -315,6 +325,17 @@
         <button id="btnLinkAdd" class="btn-glow action">Kaydet</button>
       </div>
       <div class="links-grid" id="linksGrid"></div>
+    </div>
+
+    <!-- DASHBOARD VIEW -->
+    <div class="editor-container view-hidden" id="dashboardView">
+      <!-- JS tarafından doldurulur -->
+    </div>
+
+    <!-- REVİZYON PANELİ (YKS view içinde gösterilir) -->
+    <div class="revision-panel-wrapper view-hidden" id="revisionWrapper">
+      <div class="revision-panel-header">🔁 Bugün Revize Et</div>
+      <div id="revisionPanel"></div>
     </div>
 
   </main>

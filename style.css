@@ -1829,3 +1829,246 @@ textarea.page-title {
 }
 
 
+
+/* ══════════════════════════════════════════════════════════════
+   YENİ MODÜLLER: STREAK, DASHBOARD, QUOTE, REVİZYON
+   ══════════════════════════════════════════════════════════════ */
+
+/* ---- STREAK BANNER (Sidebar) ---- */
+.streak-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 8px 12px 0;
+  padding: 10px 14px;
+  background: rgba(139, 92, 246, 0.08);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  border-radius: 10px;
+}
+.streak-label-text {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.streak-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+  font-weight: 700;
+}
+.streak-badge .streak-count {
+  color: var(--accent);
+  font-size: 18px;
+  line-height: 1;
+}
+.streak-badge .streak-label {
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+/* ---- QUOTE BANNER (Sidebar) ---- */
+.quote-banner {
+  margin: 8px 12px 0;
+  padding: 10px 14px;
+  background: rgba(6, 182, 212, 0.05);
+  border: 1px solid rgba(6, 182, 212, 0.15);
+  border-radius: 10px;
+}
+.quote-banner .quote-text {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  font-style: italic;
+  line-height: 1.5;
+}
+.quote-banner .quote-author {
+  font-size: 10.5px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  text-align: right;
+}
+
+/* ---- DASHBOARD ---- */
+.dash-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+@media (max-width: 700px) { .dash-stats-row { grid-template-columns: repeat(2, 1fr); } }
+
+.dash-stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 16px;
+  text-align: center;
+  transition: transform var(--transition), border-color var(--transition);
+}
+.dash-stat-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.14); }
+.dash-stat-card.accent { border-color: rgba(139,92,246,0.3); background: rgba(139,92,246,0.07); }
+.dash-stat-value {
+  font-size: 40px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+}
+.dash-stat-card.accent .dash-stat-value { color: var(--accent); }
+.dash-stat-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dash-section { margin-bottom: 36px; }
+.dash-section-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 16px;
+}
+
+/* Bar chart */
+.dash-bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  height: 140px;
+  padding: 0 4px;
+}
+.dash-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+.dash-bar-wrap {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+}
+.dash-bar {
+  width: 100%;
+  background: linear-gradient(180deg, var(--accent) 0%, rgba(139,92,246,0.4) 100%);
+  border-radius: 6px 6px 2px 2px;
+  min-height: 4px;
+  position: relative;
+  transition: height 0.4s cubic-bezier(0.4,0,0.2,1);
+  display: flex;
+  justify-content: center;
+}
+.dash-bar-val {
+  position: absolute;
+  top: -20px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.dash-bar-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+/* Konu dağılımı */
+.dash-topics { display: flex; flex-direction: column; gap: 10px; }
+.dash-topic-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.dash-topic-name {
+  width: 80px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+.dash-topic-bar-wrap {
+  flex: 1;
+  height: 8px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.dash-topic-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--cyan), var(--accent));
+  border-radius: 4px;
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+.dash-topic-cnt {
+  font-size: 11px;
+  color: var(--text-muted);
+  width: 55px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ---- REVİZYON PANELİ ---- */
+.revision-panel-wrapper {
+  max-width: var(--editor-max);
+  width: 100%;
+  padding: 0 96px 40px;
+}
+@media (max-width: 700px) { .revision-panel-wrapper { padding: 0 24px 40px; } }
+
+.revision-panel-header {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 12px;
+}
+.revision-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(245,158,11,0.06);
+  border: 1px solid rgba(245,158,11,0.2);
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+}
+.revision-badge {
+  background: rgba(245,158,11,0.15);
+  color: #f59e0b;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.revision-info { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.revision-lesson { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.revision-subject { font-size: 12px; color: var(--text-secondary); }
+.revision-note { font-size: 12px; color: var(--text-muted); font-style: italic; }
+.revision-empty { font-size: 13px; color: var(--text-muted); }
+
+/* Sidebar'daki revizyon badge dot */
+.revision-badge-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #f59e0b;
+  color: #000;
+  font-size: 10px;
+  font-weight: 800;
+  margin-left: 6px;
+  vertical-align: middle;
+}
