@@ -1105,6 +1105,18 @@ function attachGlobalListeners() {
     closeSlashMenu();
   });
 
+  /* ACCORDION — details/summary yerine div tabanlı toggle */
+  document.querySelectorAll('.sidebar-group-header[data-accordion]').forEach(header => {
+    header.addEventListener('click', e => {
+      /* btn-add-page gibi iç butonlara tıklanınca toggle etme */
+      if (e.target.closest('.btn-add-page')) return;
+      const group = header.closest('.sidebar-group');
+      const content = group.querySelector('.sidebar-group-content, .page-tree');
+      const isOpen = group.classList.toggle('open');
+      if (content) content.style.display = isOpen ? '' : 'none';
+    });
+  });
+
   /* NAVİGASYON — Her butona doğrudan listener eklendi */
   const navMap = {
     btnShowPages: 'pages', btnShowJournal: 'journal', btnShowRoutines: 'routines',

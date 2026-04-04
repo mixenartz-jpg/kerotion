@@ -18,55 +18,55 @@
 
     <div class="sidebar-scrollable">
       <div class="sidebar-accordion">
-        
+
         <!-- GENEL / ANA -->
-        <details class="sidebar-group" open>
-          <summary class="sidebar-group-header">🏠 ANA MERKEZ</summary>
+        <div class="sidebar-group open">
+          <div class="sidebar-group-header" data-accordion>🏠 ANA MERKEZ</div>
           <nav class="sidebar-group-content">
             <button class="menu-item active" id="btnShowPages" title="Sayfalar">📄 Çalışma Alanı</button>
           </nav>
-        </details>
+        </div>
 
         <!-- YKS MERKEZİ -->
-        <details class="sidebar-group" open>
-          <summary class="sidebar-group-header">🎯 YKS MERKEZİ</summary>
+        <div class="sidebar-group open">
+          <div class="sidebar-group-header" data-accordion>🎯 YKS MERKEZİ</div>
           <nav class="sidebar-group-content">
             <button class="menu-item" id="btnShowYks" title="Deneme Analizleri">📊 Deneme Analizi</button>
             <button class="menu-item" id="btnShowMistakes" title="Hata Defteri">📓 Hata Defteri</button>
             <button class="menu-item" id="btnShowSyllabus" title="Müfredat Takibi">📚 Müfredat Takibi</button>
           </nav>
-        </details>
+        </div>
 
         <!-- YAŞAM & VERİMLİLİK -->
-        <details class="sidebar-group" open>
-          <summary class="sidebar-group-header">⚡ YAŞAM & VERİMLİLİK</summary>
+        <div class="sidebar-group open">
+          <div class="sidebar-group-header" data-accordion>⚡ YAŞAM & VERİMLİLİK</div>
           <nav class="sidebar-group-content">
             <button class="menu-item" id="btnShowJournal" title="Günlük">📓 Kişisel Günlük</button>
             <button class="menu-item" id="btnShowRoutines" title="Disiplin">⚔️ Rutin Takibi</button>
             <button class="menu-item" id="btnShowTodo" title="Görevlerim">📋 Günlük Görevler</button>
             <button class="menu-item" id="btnShowKanban" title="Projeler">📌 Proje Panosu</button>
           </nav>
-        </details>
+        </div>
 
         <!-- ARŞİV & HAVUZ -->
-        <details class="sidebar-group">
-          <summary class="sidebar-group-header">📦 ARŞİV & BİLGİ</summary>
-          <nav class="sidebar-group-content">
+        <div class="sidebar-group">
+          <div class="sidebar-group-header" data-accordion>📦 ARŞİV & BİLGİ</div>
+          <nav class="sidebar-group-content" style="display:none">
             <button class="menu-item" id="btnShowInbox" title="Zihin Çöplüğü">📥 Inbox / Brain Dump</button>
             <button class="menu-item" id="btnShowLinks" title="Link Kasası">🔗 Link Kasası</button>
           </nav>
-        </details>
+        </div>
 
         <!-- SİSTEM SAYFALARI -->
-        <details class="sidebar-group" open>
-          <summary class="sidebar-group-header">
+        <div class="sidebar-group open">
+          <div class="sidebar-group-header" data-accordion>
             <span>📄 SAYFALAR</span>
             <button class="btn-add-page" id="btnAddRootPage" title="Yeni Sayfa">+</button>
-          </summary>
+          </div>
           <nav class="page-tree" id="pageTree">
             <!-- JS fills this -->
           </nav>
-        </details>
+        </div>
 
       </div>
     </div>
