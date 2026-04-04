@@ -12,18 +12,18 @@
 class KerotionDB {
   constructor() {
     this.keys = {
-      pages:       'kerotion_data',
-      journal:     'kerotion_journal',
-      routines:    'kerotion_routines',
-      todo:        'kerotion_todo',
-      kanban:      'kerotion_kanban',
-      yks:         'kerotion_yks',
+      pages: 'kerotion_data',
+      journal: 'kerotion_journal',
+      routines: 'kerotion_routines',
+      todo: 'kerotion_todo',
+      kanban: 'kerotion_kanban',
+      yks: 'kerotion_yks',
       yksMistakes: 'kerotion_yks_mistakes',
       yksProgress: 'kerotion_yks_syllabus',
-      pomoLog:     'kerotion_pomo_log',
-      links:       'kerotion_links',
-      inbox:       'kerotion_inbox',
-      streak:      'kerotion_streak'
+      pomoLog: 'kerotion_pomo_log',
+      links: 'kerotion_links',
+      inbox: 'kerotion_inbox',
+      streak: 'kerotion_streak'
     };
     this.state = {};
     this.saveTimer = null;
@@ -46,25 +46,25 @@ class KerotionDB {
       pages: [{
         id: 'page-1', title: 'Ilk Sayfam', parentId: null, isOpen: true,
         blocks: [
-          { id: 'b1', type: 'h1',  content: "Kerotion'a Hos Geldiniz!" },
-          { id: 'b2', type: 'p',   content: 'Burasi blok tabanli dijital calisma alaniniz.' },
+          { id: 'b1', type: 'h1', content: "Kerotion'a Hos Geldiniz!" },
+          { id: 'b2', type: 'p', content: 'Burasi blok tabanli dijital calisma alaniniz.' },
           { id: 'b3', type: 'todo', content: "Slash (/) komutunu kullanmayi deneyin.", isChecked: false }
         ]
       }],
-      journal:     [],
-      routines:    {
+      journal: [],
+      routines: {
         routines: ['TYT Paragraf/Problem Cozuldu', 'Gunun Konu Tekrari Yapildi', 'Kitap Okundu', 'Kodlama/Proje Gelistirildi'],
-        habits:   {}
+        habits: {}
       },
-      todo:        [],
-      kanban:      { ideas: [], inProgress: [], done: [] },
-      yks:         [],
+      todo: [],
+      kanban: { ideas: [], inProgress: [], done: [] },
+      yks: [],
       yksMistakes: [],
       yksProgress: {},
-      pomoLog:     [],
-      links:       [],
-      inbox:       [],
-      streak:      { current: 0, longest: 0, lastDate: null, history: [] }
+      pomoLog: [],
+      links: [],
+      inbox: [],
+      streak: { current: 0, longest: 0, lastDate: null, history: [] }
     };
     return map[key] !== undefined ? map[key] : [];
   }
@@ -87,27 +87,27 @@ DB.init();
    2. YKS MUFREDATI (11. Sinif)
    ────────────────────────────────────────────────────────────── */
 const YKS_SYLLABUS = {
-  'Matematik':  ['Trigonometri','Analitik Geometri','Fonksiyonlarda Uygulamalar','Denklem ve Esitsizlik Sistemleri','Cember ve Daire','Uzay Geometri','Olasilik'],
-  'Fizik':      ['Vektorler','Bagil Hareket',"Newton'in Hareket Yasalari",'Bir Boyutta Sabit Ivmeli Hareket','Iki Boyutta Hareket','Enerji ve Hareket','Itme ve Cizgisel Momentum','Tork','Denge','Elektriksel Kuvvet ve Alan'],
-  'Kimya':      ['Modern Atom Teorisi','Gazlar','Sivi Cozeltiler ve Cozunurluk','Kimyasal Tepkimelerde Enerji','Kimyasal Tepkimelerde Hiz','Kimyasal Tepkimelerde Denge'],
-  'Biyoloji':   ['Denetleyici ve Duzenleyici Sistemler','Duyu Organlari','Destek ve Hareket Sistemi','Sindirim Sistemi','Dolasim Sistemleri','Solunum Sistemi','Uriner Sistem','Ureme Sistemi ve Embriyonik Gelisim'],
-  'Turkce':     ['Paragrafta Anlam','Cumlenin Ogeleri','Yazim Kurallari','Noktalama Isaretleri','Sozcuk Turleri','Fiiller','Anlatim Bozukluklari']
+  'Matematik': ['Trigonometri', 'Analitik Geometri', 'Fonksiyonlarda Uygulamalar', 'Denklem ve Esitsizlik Sistemleri', 'Cember ve Daire', 'Uzay Geometri', 'Olasilik'],
+  'Fizik': ['Vektorler', 'Bagil Hareket', "Newton'in Hareket Yasalari", 'Bir Boyutta Sabit Ivmeli Hareket', 'Iki Boyutta Hareket', 'Enerji ve Hareket', 'Itme ve Cizgisel Momentum', 'Tork', 'Denge', 'Elektriksel Kuvvet ve Alan'],
+  'Kimya': ['Modern Atom Teorisi', 'Gazlar', 'Sivi Cozeltiler ve Cozunurluk', 'Kimyasal Tepkimelerde Enerji', 'Kimyasal Tepkimelerde Hiz', 'Kimyasal Tepkimelerde Denge'],
+  'Biyoloji': ['Denetleyici ve Duzenleyici Sistemler', 'Duyu Organlari', 'Destek ve Hareket Sistemi', 'Sindirim Sistemi', 'Dolasim Sistemleri', 'Solunum Sistemi', 'Uriner Sistem', 'Ureme Sistemi ve Embriyonik Gelisim'],
+  'Turkce': ['Paragrafta Anlam', 'Cumlenin Ogeleri', 'Yazim Kurallari', 'Noktalama Isaretleri', 'Sozcuk Turleri', 'Fiiller', 'Anlatim Bozukluklari']
 };
 
 /* ──────────────────────────────────────────────────────────────
    3. UYGULAMA DURUMU
    ────────────────────────────────────────────────────────────── */
-let activePageId      = DB.state.pages.length > 0 ? DB.state.pages[0].id : null;
-let currentView       = 'pages';
+let activePageId = DB.state.pages.length > 0 ? DB.state.pages[0].id : null;
+let currentView = 'pages';
 let activeJournalDate = null;
 
 // Pomodoro (volatile — DB'ye kaydedilmez)
-let pomoTimer      = null;
-let pomoWorkMins   = 25;
-let pomoBreakMins  = 5;
-let pomoTimeLeft   = 25 * 60;
-let pomoIsRunning  = false;
-let pomoState      = 'idle';
+let pomoTimer = null;
+let pomoWorkMins = 25;
+let pomoBreakMins = 5;
+let pomoTimeLeft = 25 * 60;
+let pomoIsRunning = false;
+let pomoState = 'idle';
 let pomoCycleCount = 0;
 
 let activeContextBlockId = null;
@@ -116,9 +116,9 @@ const slashMenuState = { active: false, blockId: null, selectedIndex: 0 };
 /* ──────────────────────────────────────────────────────────────
    4. YARDIMCILAR
    ────────────────────────────────────────────────────────────── */
-const generateId    = () => Math.random().toString(36).substr(2, 9);
-const scheduleSave  = ()  => DB.save();
-const getActivePage = ()  => DB.state.pages.find(p => p.id === activePageId);
+const generateId = () => Math.random().toString(36).substr(2, 9);
+const scheduleSave = () => DB.save();
+const getActivePage = () => DB.state.pages.find(p => p.id === activePageId);
 
 function autoResize(el) {
   el.style.height = 'auto';
@@ -135,73 +135,73 @@ const DOM = {};
 function refreshDOM() {
   const g = id => document.getElementById(id);
 
-  DOM.sidebar        = g('sidebar');
-  DOM.sidebarToggle  = g('sidebarToggle');
+  DOM.sidebar = g('sidebar');
+  DOM.sidebarToggle = g('sidebarToggle');
   DOM.sidebarOpenBtn = g('sidebarOpenBtn');
   DOM.btnAddRootPage = g('btnAddRootPage');
-  DOM.pageTree       = g('pageTree');
+  DOM.pageTree = g('pageTree');
 
-  DOM.pageTitle       = g('pageTitle');
+  DOM.pageTitle = g('pageTitle');
   DOM.blocksContainer = g('blocksContainer');
-  DOM.slashMenu       = g('slashMenu');
-  DOM.slashMenuList   = g('slashMenuList');
+  DOM.slashMenu = g('slashMenu');
+  DOM.slashMenuList = g('slashMenuList');
 
-  DOM.pageView     = g('pageView');
-  DOM.journalView  = g('journalView');
+  DOM.pageView = g('pageView');
+  DOM.journalView = g('journalView');
   DOM.routinesView = g('routinesView');
-  DOM.inboxView    = g('inboxView');
-  DOM.todoView     = g('todoView');
-  DOM.kanbanView   = g('kanbanView');
-  DOM.yksView      = g('yksView');
-  DOM.linksView    = g('linksView');
+  DOM.inboxView = g('inboxView');
+  DOM.todoView = g('todoView');
+  DOM.kanbanView = g('kanbanView');
+  DOM.yksView = g('yksView');
+  DOM.linksView = g('linksView');
 
-  DOM.btnShowPages    = g('btnShowPages');
-  DOM.btnShowJournal  = g('btnShowJournal');
+  DOM.btnShowPages = g('btnShowPages');
+  DOM.btnShowJournal = g('btnShowJournal');
   DOM.btnShowRoutines = g('btnShowRoutines');
-  DOM.btnShowInbox    = g('btnShowInbox');
-  DOM.btnShowTodo     = g('btnShowTodo');
-  DOM.btnShowKanban   = g('btnShowKanban');
-  DOM.btnShowYks      = g('btnShowYks');
+  DOM.btnShowInbox = g('btnShowInbox');
+  DOM.btnShowTodo = g('btnShowTodo');
+  DOM.btnShowKanban = g('btnShowKanban');
+  DOM.btnShowYks = g('btnShowYks');
   DOM.btnShowMistakes = g('btnShowMistakes');
   DOM.btnShowSyllabus = g('btnShowSyllabus');
-  DOM.btnShowLinks    = g('btnShowLinks');
+  DOM.btnShowLinks = g('btnShowLinks');
 
-  DOM.yksTabBtns     = document.querySelectorAll('.yks-tab-btn');
+  DOM.yksTabBtns = document.querySelectorAll('.yks-tab-btn');
   DOM.yksTabContents = document.querySelectorAll('.yks-tab-content');
-  DOM.btnMistakeAdd  = g('btnMistakeAdd');
-  DOM.mistakeList    = g('mistakeList');
-  DOM.syllabusGrid   = g('syllabusGrid');
+  DOM.btnMistakeAdd = g('btnMistakeAdd');
+  DOM.mistakeList = g('mistakeList');
+  DOM.syllabusGrid = g('syllabusGrid');
 
   /* FIX: Tüm pomodoro ID'leri HTML ile eslestirildi */
-  DOM.pomoTimeDisplay   = g('pomoTimeDisplay');
-  DOM.pomoStatusText    = g('pomoStatusText');
-  DOM.pomoPlayPause     = g('pomoPlayPause');
-  DOM.pomoReset         = g('pomoReset');
-  DOM.btnPomoSettings   = g('btnPomoSettings');
+  DOM.pomoTimeDisplay = g('pomoTimeDisplay');
+  DOM.pomoStatusText = g('pomoStatusText');
+  DOM.pomoPlayPause = g('pomoPlayPause');
+  DOM.pomoReset = g('pomoReset');
+  DOM.btnPomoSettings = g('btnPomoSettings');
   DOM.pomoSettingsPanel = g('pomoSettingsPanel');
-  DOM.pomoCustomWork    = g('pomoCustomWork');
-  DOM.pomoCustomBreak   = g('pomoCustomBreak');
-  DOM.pomoApplyCustom   = g('btnPomoApplyCustom');
-  DOM.pomoFocusTarget   = g('pomoFocusTarget');  /* FIX: dogru ID */
-  DOM.pomoModes         = document.querySelectorAll('.pomo-mode');
-  DOM.pomoZoneBtn       = g('btnPomoZone');
+  DOM.pomoCustomWork = g('pomoCustomWork');
+  DOM.pomoCustomBreak = g('pomoCustomBreak');
+  DOM.pomoApplyCustom = g('btnPomoApplyCustom');
+  DOM.pomoFocusTarget = g('pomoFocusTarget');  /* FIX: dogru ID */
+  DOM.pomoModes = document.querySelectorAll('.pomo-mode');
+  DOM.pomoZoneBtn = g('btnPomoZone');
 
   /* FIX: Zone elementleri refreshDOM'a eklendi */
-  DOM.theZone          = g('theZone');
-  DOM.btnZoneExit      = g('btnZoneExit');
+  DOM.theZone = g('theZone');
+  DOM.btnZoneExit = g('btnZoneExit');
   DOM.zoneTimerDisplay = g('zoneTimerDisplay');
-  DOM.zoneStatusText   = g('zoneStatusText');
+  DOM.zoneStatusText = g('zoneStatusText');
   DOM.zoneCycleDisplay = g('zoneCycleDisplay');
 
   DOM.blockContextMenu = g('blockContextMenu');
-  DOM.btnDeleteBlock   = g('btnDeleteBlock');
-  DOM.contextColors    = document.querySelectorAll('.color-badge');
+  DOM.btnDeleteBlock = g('btnDeleteBlock');
+  DOM.contextColors = document.querySelectorAll('.color-badge');
 
   /* FIX: brain dump, todo, kanban inputlari artik burada tanimlaniyor */
-  DOM.bdModal      = g('brainDumpModal');
-  DOM.bdInput      = g('brainDumpInput');
-  DOM.todoInput    = g('todoInput');
-  DOM.kanbanInput  = g('kanbanInput');
+  DOM.bdModal = g('brainDumpModal');
+  DOM.bdInput = g('brainDumpInput');
+  DOM.todoInput = g('todoInput');
+  DOM.kanbanInput = g('kanbanInput');
   DOM.btnKanbanAdd = g('btnKanbanAdd');
 
   if (!DOM.sidebar || !DOM.pageView || !DOM.blocksContainer) {
@@ -266,7 +266,7 @@ function renderTree(parentId = null, container = DOM.pageTree) {
   if (!children.length) return;
 
   children.forEach(page => {
-    const node    = document.createElement('div');
+    const node = document.createElement('div');
     node.className = 'tree-node';
 
     const content = document.createElement('div');
@@ -288,7 +288,7 @@ function renderTree(parentId = null, container = DOM.pageTree) {
       renderTree();
     });
 
-    const icon  = document.createElement('span');
+    const icon = document.createElement('span');
     icon.className = 'tree-icon';
     icon.textContent = '📄';
 
@@ -361,7 +361,7 @@ function switchView(viewName) {
 
   /* 2. Hedefi goster */
   const targetId = VIEW_MAP[viewName] || viewName;
-  const target   = document.getElementById(targetId);
+  const target = document.getElementById(targetId);
   if (target) {
     target.classList.remove('view-hidden');
     target.classList.add('view-active');
@@ -389,15 +389,15 @@ function switchView(viewName) {
 
   /* 5. Modul render */
   const renderMap = {
-    yks:      () => { renderYksBar(); renderMistakeVault(); renderSyllabusTracker(); },
+    yks: () => { renderYksBar(); renderMistakeVault(); renderSyllabusTracker(); },
     mistakes: () => { renderYksBar(); renderMistakeVault(); renderSyllabusTracker(); },
     syllabus: () => { renderYksBar(); renderMistakeVault(); renderSyllabusTracker(); },
-    journal:  renderJournalList,
+    journal: renderJournalList,
     routines: renderRoutinesGrid,
-    inbox:    renderInbox,
-    todo:     renderTodo,
-    kanban:   renderKanban,
-    links:    renderLinks,
+    inbox: renderInbox,
+    todo: renderTodo,
+    kanban: renderKanban,
+    links: renderLinks,
     dashboard: renderDashboard
   };
   if (renderMap[viewName]) renderMap[viewName]();
@@ -408,7 +408,7 @@ function switchView(viewName) {
    ────────────────────────────────────────────────────────────── */
 const PLACEHOLDERS = {
   h1: 'Baslik 1', h2: 'Baslik 2', h3: 'Baslik 3',
-  p:  "Yazmak icin tiklayin veya '/' tusuna basin",
+  p: "Yazmak icin tiklayin veya '/' tusuna basin",
   todo: 'Yapilacak', ul: 'Liste ogesi'
 };
 
@@ -460,8 +460,8 @@ function createBlockElement(block) {
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
     const rect = wrap.getBoundingClientRect();
-    const mid  = rect.top + rect.height / 2;
-    wrap.classList.toggle('drag-over',        e.clientY < mid);
+    const mid = rect.top + rect.height / 2;
+    wrap.classList.toggle('drag-over', e.clientY < mid);
     wrap.classList.toggle('drag-over-bottom', e.clientY >= mid);
   });
   wrap.addEventListener('dragleave', () => wrap.classList.remove('drag-over', 'drag-over-bottom'));
@@ -475,8 +475,8 @@ function createBlockElement(block) {
     const ti = pg.blocks.findIndex(b => b.id === block.id);
     if (di < 0 || ti < 0) return;
     const [moved] = pg.blocks.splice(di, 1);
-    const newTi   = pg.blocks.findIndex(b => b.id === block.id);
-    const rect    = wrap.getBoundingClientRect();
+    const newTi = pg.blocks.findIndex(b => b.id === block.id);
+    const rect = wrap.getBoundingClientRect();
     pg.blocks.splice(e.clientY >= rect.top + rect.height / 2 ? newTi + 1 : newTi, 0, moved);
     scheduleSave();
     renderBlocks();
@@ -515,13 +515,13 @@ function createBlockElement(block) {
     }
   });
   el.addEventListener('keydown', e => handleBlockKeydown(e, block, el));
-  el.addEventListener('blur',   () => setTimeout(() => { if (slashMenuState.active) closeSlashMenu(); }, 150));
+  el.addEventListener('blur', () => setTimeout(() => { if (slashMenuState.active) closeSlashMenu(); }, 150));
 
   if (block.color && block.color !== '#f4f4f5') el.style.color = block.color;
   if (block.fontSize) el.style.fontSize = block.fontSize + 'px';
   if (block.fontWeight) el.style.fontWeight = block.fontWeight;
-  if (block.fontStyle)  el.style.fontStyle  = block.fontStyle;
-  if (block.textAlign)  el.style.textAlign  = block.textAlign;
+  if (block.fontStyle) el.style.fontStyle = block.fontStyle;
+  if (block.textAlign) el.style.textAlign = block.textAlign;
 
   wrap.appendChild(controls);
   wrap.appendChild(el);
@@ -529,16 +529,16 @@ function createBlockElement(block) {
 }
 
 function insertNewBlockAfter(currentId, newType = 'p') {
-  const page  = getActivePage();
-  const idx   = page.blocks.findIndex(b => b.id === currentId);
-  const nb    = { id: generateId(), type: newType, content: '' };
+  const page = getActivePage();
+  const idx = page.blocks.findIndex(b => b.id === currentId);
+  const nb = { id: generateId(), type: newType, content: '' };
   if (newType === 'p' && idx >= 0) {
     const ct = page.blocks[idx].type;
     if (ct === 'ul' || ct === 'todo') nb.type = ct;
   }
   page.blocks.splice(idx + 1, 0, nb);
   scheduleSave();
-  const cw  = DOM.blocksContainer.querySelector('[data-id="' + currentId + '"]');
+  const cw = DOM.blocksContainer.querySelector('[data-id="' + currentId + '"]');
   const nEl = createBlockElement(nb);
   if (cw) cw.after(nEl); else DOM.blocksContainer.appendChild(nEl);
   focusBlock(nb.id);
@@ -547,10 +547,10 @@ function insertNewBlockAfter(currentId, newType = 'p') {
 
 function handleBlockKeydown(e, block, el) {
   if (slashMenuState.active) {
-    if (e.key === 'ArrowDown') { e.preventDefault(); navigateSlashMenu(1);  return; }
-    if (e.key === 'ArrowUp')   { e.preventDefault(); navigateSlashMenu(-1); return; }
-    if (e.key === 'Enter')     { e.preventDefault(); applySlashMenuSelection(); return; }
-    if (e.key === 'Escape')    { closeSlashMenu(); return; }
+    if (e.key === 'ArrowDown') { e.preventDefault(); navigateSlashMenu(1); return; }
+    if (e.key === 'ArrowUp') { e.preventDefault(); navigateSlashMenu(-1); return; }
+    if (e.key === 'Enter') { e.preventDefault(); applySlashMenuSelection(); return; }
+    if (e.key === 'Escape') { closeSlashMenu(); return; }
   }
   if (e.key === 'Enter') {
     e.preventDefault();
@@ -593,14 +593,14 @@ function focusBlock(id, atEnd = false) {
 }
 
 function changeBlockType(id, newType) {
-  const page  = getActivePage();
+  const page = getActivePage();
   const block = page.blocks.find(b => b.id === id);
   if (!block) return;
   block.type = newType;
   if (block.content.endsWith('/')) block.content = block.content.slice(0, -1);
   scheduleSave();
   const old = DOM.blocksContainer.querySelector('[data-id="' + id + '"]');
-  const nw  = createBlockElement(block);
+  const nw = createBlockElement(block);
   if (old) DOM.blocksContainer.replaceChild(nw, old);
   focusBlock(id, true);
 }
@@ -611,7 +611,7 @@ function getDefaultFontSize(type) {
 }
 
 function changeBlockColor(id, color) {
-  const page  = getActivePage();
+  const page = getActivePage();
   const block = page.blocks.find(b => b.id === id);
   if (!block) return;
   block.color = color;
@@ -628,7 +628,7 @@ function openSlashMenu(blockId, el) {
   slashMenuState.selectedIndex = 0;
   const rect = el.getBoundingClientRect();
   DOM.slashMenu.style.display = 'block';
-  DOM.slashMenu.style.top  = (rect.bottom + window.scrollY + 5) + 'px';
+  DOM.slashMenu.style.top = (rect.bottom + window.scrollY + 5) + 'px';
   DOM.slashMenu.style.left = (rect.left + window.scrollX) + 'px';
   updateSlashMenuSelection();
 }
@@ -647,7 +647,7 @@ function updateSlashMenuSelection() {
 }
 function applySlashMenuSelection() {
   if (!slashMenuState.active) return;
-  const items    = DOM.slashMenuList.querySelectorAll('.slash-menu-item');
+  const items = DOM.slashMenuList.querySelectorAll('.slash-menu-item');
   const selected = items[slashMenuState.selectedIndex];
   if (selected && slashMenuState.blockId) changeBlockType(slashMenuState.blockId, selected.dataset.type);
   closeSlashMenu();
@@ -692,19 +692,19 @@ function hideContextMenu() {
    12. POMODORO
    ────────────────────────────────────────────────────────────── */
 function formatPomoTime(s) {
-  return Math.floor(s/60).toString().padStart(2,'0') + ':' + (s%60).toString().padStart(2,'0');
+  return Math.floor(s / 60).toString().padStart(2, '0') + ':' + (s % 60).toString().padStart(2, '0');
 }
 
 function updatePomoDisplay() {
   const tStr = formatPomoTime(pomoTimeLeft);
-  let label  = 'Bekliyor';
-  if (pomoState === 'work')  label = 'CALISMA';
+  let label = 'Bekliyor';
+  if (pomoState === 'work') label = 'CALISMA';
   if (pomoState === 'break') label = 'MOLA';
 
-  if (DOM.pomoTimeDisplay)  DOM.pomoTimeDisplay.textContent  = tStr;
-  if (DOM.pomoStatusText)   DOM.pomoStatusText.textContent   = 'Durum: ' + label + ' (Seans: ' + pomoCycleCount + ')';
+  if (DOM.pomoTimeDisplay) DOM.pomoTimeDisplay.textContent = tStr;
+  if (DOM.pomoStatusText) DOM.pomoStatusText.textContent = 'Durum: ' + label + ' (Seans: ' + pomoCycleCount + ')';
   if (DOM.zoneTimerDisplay) DOM.zoneTimerDisplay.textContent = tStr;
-  if (DOM.zoneStatusText)   DOM.zoneStatusText.textContent   =
+  if (DOM.zoneStatusText) DOM.zoneStatusText.textContent =
     pomoState === 'work' ? 'ODAK: CALISMA' : pomoState === 'break' ? 'ZiHiN: MOLA' : 'ODAK MERKEZi';
   if (DOM.zoneCycleDisplay) DOM.zoneCycleDisplay.textContent = 'Tamamlanan Seans: ' + pomoCycleCount;
 
@@ -715,8 +715,8 @@ function updatePomoDisplay() {
 
 function playPomoSound() {
   try {
-    const ctx  = new (window.AudioContext || window.webkitAudioContext)();
-    const osc  = ctx.createOscillator();
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = 'sine';
     osc.frequency.setValueAtTime(800, ctx.currentTime);
@@ -726,7 +726,7 @@ function playPomoSound() {
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
     osc.connect(gain); gain.connect(ctx.destination);
     osc.start(); osc.stop(ctx.currentTime + 0.7);
-  } catch(e) { /* Ses desteklenmiyor */ }
+  } catch (e) { /* Ses desteklenmiyor */ }
 }
 
 function notifyPomoEnd(isWork) {
@@ -746,7 +746,7 @@ function endPomodoro() {
   if (pomoState === 'work') {
     notifyPomoEnd(true);
     pomoCycleCount++;
-    const today  = getTodayDateStr();
+    const today = getTodayDateStr();
     const target = DOM.pomoFocusTarget ? DOM.pomoFocusTarget.value : 'Genel';
     DB.state.pomoLog.push({ date: today, time: new Date().toLocaleTimeString(), target, duration: pomoWorkMins });
     if (!DB.state.routines.habits[today]) DB.state.routines.habits[today] = {};
@@ -755,11 +755,11 @@ function endPomodoro() {
     updateStreak(today);
     scheduleSave();
     if (currentView === 'routines') renderRoutinesGrid();
-    pomoState    = 'break';
+    pomoState = 'break';
     pomoTimeLeft = pomoBreakMins * 60;
   } else {
     notifyPomoEnd(false);
-    pomoState    = 'work';
+    pomoState = 'work';
     pomoTimeLeft = pomoWorkMins * 60;
   }
   updatePomoDisplay();
@@ -805,28 +805,28 @@ function toggleZone() { if (DOM.theZone) DOM.theZone.classList.toggle('zone-hidd
    ────────────────────────────────────────────────────────────── */
 function getTodayDateStr() {
   const d = new Date();
-  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
 }
 
 function renderJournalList() {
-  const listEl     = document.getElementById('journalList');
-  const editorEl   = document.getElementById('journalEditor');
+  const listEl = document.getElementById('journalList');
+  const editorEl = document.getElementById('journalEditor');
   const controlsEl = document.querySelector('.journal-controls');
   if (!listEl) return;
   listEl.classList.remove('view-hidden');
   if (controlsEl) controlsEl.classList.remove('view-hidden');
-  if (editorEl)   editorEl.classList.add('view-hidden');
+  if (editorEl) editorEl.classList.add('view-hidden');
   listEl.innerHTML = '';
 
   if (!DB.state.journal.length) {
     listEl.innerHTML = "<p style='color:var(--text-muted);'>Henüz günlük kaydı yok. Bugün yazmaya başla!</p>";
     return;
   }
-  [...DB.state.journal].sort((a,b) => b.date.localeCompare(a.date)).forEach(entry => {
+  [...DB.state.journal].sort((a, b) => b.date.localeCompare(a.date)).forEach(entry => {
     const card = document.createElement('div');
     card.className = 'journal-card';
     card.innerHTML = '<div class="journal-card-header"><span class="journal-card-title">' + entry.date + '</span></div>' +
-      '<div class="journal-card-preview">' + (entry.notes ? entry.notes.slice(0,100) + '...' : 'Boş kayıt...') + '</div>';
+      '<div class="journal-card-preview">' + (entry.notes ? entry.notes.slice(0, 100) + '...' : 'Boş kayıt...') + '</div>';
     card.addEventListener('click', () => openJournalEditor(entry.date));
     listEl.appendChild(card);
   });
@@ -842,9 +842,9 @@ function openJournalEditor(dateStr) {
   }
   const dateEl = document.getElementById('journalCurrentDate');
   if (dateEl) dateEl.textContent = dateStr;
-  const n = document.getElementById('journalNotes');   if (n) n.value = entry.notes   || '';
+  const n = document.getElementById('journalNotes'); if (n) n.value = entry.notes || '';
   const l = document.getElementById('journalLearned'); if (l) l.value = entry.learned || '';
-  const b = document.getElementById('journalBetter');  if (b) b.value = entry.better  || '';
+  const b = document.getElementById('journalBetter'); if (b) b.value = entry.better || '';
   document.getElementById('journalList')?.classList.add('view-hidden');
   document.querySelector('.journal-controls')?.classList.add('view-hidden');
   document.getElementById('journalEditor')?.classList.remove('view-hidden');
@@ -854,9 +854,9 @@ function saveJournalEntry() {
   if (!activeJournalDate) return;
   const entry = DB.state.journal.find(j => j.date === activeJournalDate);
   if (entry) {
-    entry.notes   = document.getElementById('journalNotes')?.value   || '';
+    entry.notes = document.getElementById('journalNotes')?.value || '';
     entry.learned = document.getElementById('journalLearned')?.value || '';
-    entry.better  = document.getElementById('journalBetter')?.value  || '';
+    entry.better = document.getElementById('journalBetter')?.value || '';
     scheduleSave();
     const btn = document.getElementById('btnSaveJournal');
     if (btn) { btn.textContent = 'Kaydedildi!'; setTimeout(() => btn.textContent = 'Kaydet', 2000); }
@@ -877,9 +877,9 @@ function renderRoutinesGrid() {
   const days = Array.from({ length: 7 }, (_, i) => {
     const d = new Date(); d.setDate(d.getDate() - (6 - i));
     return {
-      date: d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'),
+      date: d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'),
       name: d.toLocaleDateString('tr-TR', { weekday: 'short' }),
-      num:  d.getDate()
+      num: d.getDate()
     };
   });
   const grid = document.createElement('div');
@@ -932,7 +932,7 @@ function renderRoutinesGrid() {
 
 function addRoutine() {
   const input = document.getElementById('newRoutineInput');
-  const val   = input?.value.trim();
+  const val = input?.value.trim();
   if (!val || DB.state.routines.routines.includes(val)) return;
   DB.state.routines.routines.push(val);
   scheduleSave(); renderRoutinesGrid();
@@ -1016,7 +1016,7 @@ function addKanbanCard() {
 
 function setupKanbanDrop() {
   document.querySelectorAll('.kanban-col').forEach(col => {
-    col.addEventListener('dragover',  e => { e.preventDefault(); col.classList.add('drag-over-kanban'); });
+    col.addEventListener('dragover', e => { e.preventDefault(); col.classList.add('drag-over-kanban'); });
     col.addEventListener('dragleave', () => col.classList.remove('drag-over-kanban'));
     col.addEventListener('drop', e => {
       e.preventDefault(); col.classList.remove('drag-over-kanban');
@@ -1027,7 +1027,7 @@ function setupKanbanDrop() {
         const task = DB.state.kanban[colId].splice(idx, 1)[0];
         DB.state.kanban[target].push(task);
         scheduleSave(); renderKanban();
-      } catch(_) {}
+      } catch (_) { }
     });
   });
 }
@@ -1052,12 +1052,12 @@ function renderYksBar() {
   }
   const maxNet = 120;
   DB.state.yks.forEach((entry, idx) => {
-    const wrap  = document.createElement('div'); wrap.className  = 'yks-bar-wrap';
-    const bar   = document.createElement('div'); bar.className   = 'yks-bar';
+    const wrap = document.createElement('div'); wrap.className = 'yks-bar-wrap';
+    const bar = document.createElement('div'); bar.className = 'yks-bar';
     bar.style.height = '0%';
     bar.title = entry.name + ': ' + entry.net + ' Net (Çift tıkla sil)';
     setTimeout(() => { bar.style.height = Math.min((entry.net / maxNet) * 100, 100) + '%'; }, 50);
-    const val   = document.createElement('div'); val.className   = 'yks-value'; val.textContent = entry.net;
+    const val = document.createElement('div'); val.className = 'yks-value'; val.textContent = entry.net;
     const label = document.createElement('div'); label.className = 'yks-label'; label.textContent = entry.name;
     wrap.ondblclick = () => {
       if (confirm('"' + entry.name + '" silinsin mi?')) { DB.state.yks.splice(idx, 1); scheduleSave(); renderYksBar(); }
@@ -1067,15 +1067,15 @@ function renderYksBar() {
 }
 
 function addMistakeLog() {
-  const lesson  = document.getElementById('mistakeLesson')?.value.trim();
+  const lesson = document.getElementById('mistakeLesson')?.value.trim();
   const subject = document.getElementById('mistakeSubject')?.value.trim();
-  const reason  = document.getElementById('mistakeReason')?.value || 'Bilgi';
-  const note    = document.getElementById('mistakeNote')?.value.trim() || '';
+  const reason = document.getElementById('mistakeReason')?.value || 'Bilgi';
+  const note = document.getElementById('mistakeNote')?.value.trim() || '';
   if (!lesson || !subject) { alert('Ders ve Konu alanları zorunludur!'); return; }
   DB.state.yksMistakes.push({ id: generateId(), date: getTodayDateStr(), lesson, subject, reason, note });
-  document.getElementById('mistakeLesson').value  = '';
+  document.getElementById('mistakeLesson').value = '';
   document.getElementById('mistakeSubject').value = '';
-  document.getElementById('mistakeNote').value    = '';
+  document.getElementById('mistakeNote').value = '';
   scheduleSave(); renderMistakeVault();
 }
 
@@ -1107,9 +1107,9 @@ function renderSyllabusTracker() {
   if (!grid) return;
   grid.innerHTML = '';
   Object.keys(YKS_SYLLABUS).forEach(lesson => {
-    const topics   = YKS_SYLLABUS[lesson];
+    const topics = YKS_SYLLABUS[lesson];
     const finished = DB.state.yksProgress[lesson] || [];
-    const percent  = topics.length ? Math.round((finished.length / topics.length) * 100) : 0;
+    const percent = topics.length ? Math.round((finished.length / topics.length) * 100) : 0;
     const card = document.createElement('div');
     card.className = 'syllabus-card';
     card.innerHTML = '<div class="syllabus-header"><span class="syllabus-lesson-name">' + lesson + '</span>' +
@@ -1118,7 +1118,7 @@ function renderSyllabusTracker() {
       '<div class="syllabus-topics">' +
       topics.map(topic => {
         const done = finished.includes(topic);
-        const safe = topic.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+        const safe = topic.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
         return '<label class="topic-item' + (done ? ' done' : '') + '">' +
           '<input type="checkbox" ' + (done ? 'checked' : '') + ' onchange="window.toggleTopic(\'' + lesson + "','" + safe + '\')">' +
           '<span>' + topic + '</span></label>';
@@ -1238,7 +1238,7 @@ function attachGlobalListeners() {
     if (n && !isNaN(v)) {
       DB.state.yks.push({ name: n, net: v });
       document.getElementById('yksNameInput').value = '';
-      document.getElementById('yksNetInput').value  = '';
+      document.getElementById('yksNetInput').value = '';
       scheduleSave(); renderYksBar();
     }
   });
@@ -1246,7 +1246,7 @@ function attachGlobalListeners() {
   document.getElementById('btnLinkAdd')?.addEventListener('click', () => {
     const title = document.getElementById('linkTitleInput')?.value.trim();
     const urlEl = document.getElementById('linkUrlInput');
-    let url     = urlEl?.value.trim();
+    let url = urlEl?.value.trim();
     if (!title || !url) return;
     if (!url.startsWith('http')) url = 'https://' + url;
     DB.state.links.push({ title, url });
@@ -1261,7 +1261,7 @@ function attachGlobalListeners() {
     }
   });
 
-  DOM.kanbanInput?.addEventListener('keydown',  e => { if (e.key === 'Enter') addKanbanCard(); });
+  DOM.kanbanInput?.addEventListener('keydown', e => { if (e.key === 'Enter') addKanbanCard(); });
   DOM.btnKanbanAdd?.addEventListener('click', addKanbanCard);
   setupKanbanDrop();
 
@@ -1315,7 +1315,7 @@ function attachGlobalListeners() {
   document.querySelectorAll('.ctx-size-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       if (!activeContextBlockId) return;
-      const page  = getActivePage();
+      const page = getActivePage();
       const block = page?.blocks.find(b => b.id === activeContextBlockId);
       if (!block) return;
       block.fontSize = parseInt(btn.dataset.size);
@@ -1330,7 +1330,7 @@ function attachGlobalListeners() {
   // Bold
   document.getElementById('ctxBtnBold')?.addEventListener('click', () => {
     if (!activeContextBlockId) return;
-    const page  = getActivePage();
+    const page = getActivePage();
     const block = page?.blocks.find(b => b.id === activeContextBlockId);
     if (!block) return;
     block.fontWeight = block.fontWeight === 'bold' ? '' : 'bold';
@@ -1343,7 +1343,7 @@ function attachGlobalListeners() {
   // Italic
   document.getElementById('ctxBtnItalic')?.addEventListener('click', () => {
     if (!activeContextBlockId) return;
-    const page  = getActivePage();
+    const page = getActivePage();
     const block = page?.blocks.find(b => b.id === activeContextBlockId);
     if (!block) return;
     block.fontStyle = block.fontStyle === 'italic' ? '' : 'italic';
@@ -1354,17 +1354,17 @@ function attachGlobalListeners() {
   });
 
   // Align
-  ['Left','Center','Right'].forEach(dir => {
+  ['Left', 'Center', 'Right'].forEach(dir => {
     document.getElementById('ctxBtnAlign' + dir)?.addEventListener('click', () => {
       if (!activeContextBlockId) return;
-      const page  = getActivePage();
+      const page = getActivePage();
       const block = page?.blocks.find(b => b.id === activeContextBlockId);
       if (!block) return;
       const val = dir.toLowerCase();
       block.textAlign = block.textAlign === val ? '' : val;
       const el = document.getElementById('block-' + activeContextBlockId);
       if (el) el.style.textAlign = block.textAlign;
-      ['Left','Center','Right'].forEach(d =>
+      ['Left', 'Center', 'Right'].forEach(d =>
         document.getElementById('ctxBtnAlign' + d)?.classList.toggle('active', block.textAlign === d.toLowerCase())
       );
       scheduleSave();
@@ -1413,15 +1413,15 @@ function updateStreak(today) {
   } else {
     s.current = 1;
   }
-  s.longest  = Math.max(s.longest, s.current);
+  s.longest = Math.max(s.longest, s.current);
   s.lastDate = today;
   if (!s.history.includes(today)) s.history.push(today);
   renderStreakBadge();
 }
 
 function renderStreakBadge() {
-  const s   = DB.state.streak;
-  const el  = document.getElementById('streakBadge');
+  const s = DB.state.streak;
+  const el = document.getElementById('streakBadge');
   if (!el) return;
   const fire = s.current >= 7 ? '🔥🔥' : s.current >= 3 ? '🔥' : '🌱';
   el.innerHTML = `${fire} <span class="streak-count">${s.current}</span> <span class="streak-label">gün</span>`;
@@ -1446,13 +1446,13 @@ function renderDashboard() {
     date,
     label: new Date(date).toLocaleDateString('tr-TR', { weekday: 'short' }),
     count: DB.state.pomoLog.filter(l => l.date === date).length,
-    mins:  DB.state.pomoLog.filter(l => l.date === date).reduce((s, l) => s + (l.duration || 25), 0)
+    mins: DB.state.pomoLog.filter(l => l.date === date).reduce((s, l) => s + (l.duration || 25), 0)
   }));
 
-  const totalPomos   = DB.state.pomoLog.length;
-  const totalMins    = DB.state.pomoLog.reduce((s, l) => s + (l.duration || 25), 0);
-  const todayPomos   = DB.state.pomoLog.filter(l => l.date === today).length;
-  const maxCount     = Math.max(...dailyCounts.map(d => d.count), 1);
+  const totalPomos = DB.state.pomoLog.length;
+  const totalMins = DB.state.pomoLog.reduce((s, l) => s + (l.duration || 25), 0);
+  const todayPomos = DB.state.pomoLog.filter(l => l.date === today).length;
+  const maxCount = Math.max(...dailyCounts.map(d => d.count), 1);
 
   // Konu dağılımı
   const targetMap = {};
@@ -1461,7 +1461,7 @@ function renderDashboard() {
 
   container.innerHTML = `
     <header class="page-header">
-      <h1 class="page-title">📊 Çalışma İstatistikleri</h1>
+      <h1 class="page-title">📊 Çalışma İstatistiklerin</h1>
       <p class="view-subtitle">Geçmiş performansın ve alışkanlıkların.</p>
     </header>
 
@@ -1559,7 +1559,7 @@ const REVISION_INTERVALS = [3, 7, 14];
 
 function getDaysDiff(dateStr) {
   const then = new Date(dateStr);
-  const now  = new Date();
+  const now = new Date();
   return Math.floor((now - then) / 86400000);
 }
 
