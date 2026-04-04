@@ -1105,16 +1105,20 @@ function attachGlobalListeners() {
     closeSlashMenu();
   });
 
-  /* FIX: Navigasyon — Event Delegation ile tek listener */
-  document.querySelector('.sidebar-scrollable')?.addEventListener('click', e => {
-    const btn = e.target.closest('.menu-item');
-    if (!btn) return;
-    const map = {
-      btnShowPages: 'pages', btnShowJournal: 'journal', btnShowRoutines: 'routines',
-      btnShowInbox: 'inbox', btnShowTodo: 'todo', btnShowKanban: 'kanban',
-      btnShowYks: 'yks', btnShowMistakes: 'mistakes', btnShowSyllabus: 'syllabus', btnShowLinks: 'links'
-    };
-    if (map[btn.id]) switchView(map[btn.id]);
+  /* NAVİGASYON — Her butona doğrudan listener eklendi */
+  const navMap = {
+    btnShowPages: 'pages', btnShowJournal: 'journal', btnShowRoutines: 'routines',
+    btnShowInbox: 'inbox', btnShowTodo: 'todo', btnShowKanban: 'kanban',
+    btnShowYks: 'yks', btnShowMistakes: 'mistakes', btnShowSyllabus: 'syllabus', btnShowLinks: 'links'
+  };
+  Object.entries(navMap).forEach(([id, view]) => {
+    const btn = document.getElementById(id);
+    if (btn) {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        switchView(view);
+      });
+    }
   });
 
   DOM.yksTabBtns.forEach(btn => btn.addEventListener('click', () => switchYksTab(btn.dataset.tab)));

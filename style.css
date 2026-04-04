@@ -197,7 +197,7 @@ body {
 
 .sidebar-group {
   border-radius: var(--radius);
-  overflow: hidden;
+  overflow: visible;
   transition: all var(--transition);
 }
 
@@ -240,6 +240,8 @@ body {
   flex-direction: column;
   gap: 2px;
   padding: 4px 0 8px 8px;
+  position: relative;
+  z-index: 10;
 }
 
 /* Menu Items inside Content */
@@ -258,6 +260,8 @@ body {
   align-items: center;
   gap: 10px;
   transition: all var(--transition);
+  position: relative;
+  z-index: 11;
 }
 
 .menu-item:hover {
