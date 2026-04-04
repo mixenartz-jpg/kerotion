@@ -2015,6 +2015,117 @@ textarea.page-title {
   flex-shrink: 0;
 }
 
+/* ---- BLOCK FORMAT TOOLBAR ---- */
+.block-format-toolbar {
+  position: absolute;
+  left: 0;
+  top: -40px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: rgba(14, 14, 18, 0.97);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 8px;
+  padding: 4px 6px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.06);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  transform: translateY(4px);
+  z-index: 200;
+  white-space: nowrap;
+}
+.kerotion-block-wrap:hover .block-format-toolbar,
+.block-format-toolbar:hover,
+.block-format-toolbar.pinned {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(0);
+}
+/* For h1/h2/h3 the block has large top margin, keep toolbar near the text */
+.kerotion-block-wrap.h1 .block-format-toolbar { top: -4px; left: 28px; }
+.kerotion-block-wrap.h2 .block-format-toolbar { top: -4px; left: 28px; }
+.kerotion-block-wrap.h3 .block-format-toolbar { top: -4px; left: 28px; }
+.kerotion-block-wrap.p  .block-format-toolbar { top: -40px; left: 28px; }
+.kerotion-block-wrap.ul .block-format-toolbar { top: -40px; left: 28px; }
+.kerotion-block-wrap.todo .block-format-toolbar { top: -40px; left: 28px; }
+
+.fmt-sep {
+  width: 1px;
+  height: 18px;
+  background: rgba(255,255,255,0.1);
+  margin: 0 3px;
+  flex-shrink: 0;
+}
+
+.fmt-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  padding: 0 5px;
+  border-radius: 5px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+  white-space: nowrap;
+}
+.fmt-btn:hover {
+  background: var(--hover-bg);
+  color: var(--text-primary);
+  border-color: rgba(255,255,255,0.1);
+}
+.fmt-btn.active {
+  background: var(--accent-light);
+  color: var(--accent);
+  border-color: rgba(139,92,246,0.35);
+  box-shadow: inset 0 0 8px rgba(139,92,246,0.15);
+}
+.fmt-btn.danger:hover {
+  background: rgba(244,63,94,0.15);
+  color: var(--danger);
+  border-color: rgba(244,63,94,0.3);
+}
+
+/* Font size select inside toolbar */
+.fmt-size-select {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 5px;
+  height: 26px;
+  outline: none;
+  transition: all 0.15s;
+  min-width: 42px;
+  -webkit-appearance: none;
+  appearance: none;
+  text-align: center;
+}
+.fmt-size-select:hover,
+.fmt-size-select:focus {
+  background: var(--hover-bg);
+  color: var(--text-primary);
+  border-color: rgba(255,255,255,0.1);
+}
+.fmt-size-select option {
+  background: #0e0e12;
+  color: var(--text-primary);
+}
+
 /* ---- REVİZYON PANELİ ---- */
 .revision-panel-wrapper {
   max-width: var(--editor-max);

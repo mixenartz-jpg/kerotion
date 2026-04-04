@@ -518,10 +518,150 @@ function createBlockElement(block) {
   el.addEventListener('blur',   () => setTimeout(() => { if (slashMenuState.active) closeSlashMenu(); }, 150));
 
   if (block.color && block.color !== '#f4f4f5') el.style.color = block.color;
+  if (block.fontSize) el.style.fontSize = block.fontSize + 'px';
+  if (block.textAlign) el.style.textAlign = block.textAlign;
+  if (block.fontWeight === 'bold') el.style.fontWeight = 'bold';
+  if (block.fontStyle === 'italic') el.style.fontStyle = 'italic';
+
+  // ── FORMAT TOOLBAR ──
+  const toolbar = document.createElement('div');
+  toolbar.className = 'block-format-toolbar';
+
+  // Font size select
+  const sizeSelect = document.createElement('select');
+  sizeSelect.className = 'fmt-size-select';
+  sizeSelect.title = 'Yazı Boyutu';
+  const fontSizes = [12, 13, 14, 15, 16, 18, 20, 22, 24, 28, 32, 36, 40, 48];
+  const currentSize = block.fontSize || getDefaultFontSize(block.type);
+  fontSizes.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s;
+    opt.textContent = s + 'px';
+    if (s === currentSize) opt.selected = true;
+    sizeSelect.appendChild(opt);
+  });
+  sizeSelect.addEventListener('mousedown', e => e.stopPropagation());
+  sizeSelect.addEventListener('change', () => {
+    block.fontSize = parseInt(sizeSelect.value);
+    el.style.fontSize = block.fontSize + 'px';
+    scheduleSave();
+  });
+
+  // Bold button
+  const btnBold = document.createElement('button');
+  btnBold.className = 'fmt-btn' + (block.fontWeight === 'bold' ? ' active' : '');
+  btnBold.innerHTML = '<b>B</b>';
+  btnBold.title = 'Kalın (Bold)';
+  btnBold.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); });
+  btnBold.addEventListener('click', e => {
+    e.stopPropagation();
+    block.fontWeight = block.fontWeight === 'bold' ? '' : 'bold';
+    el.style.fontWeight = block.fontWeight;
+    btnBold.classList.toggle('active', block.fontWeight === 'bold');
+    scheduleSave();
+  });
+
+  // Italic button
+  const btnItalic = document.createElement('button');
+  btnItalic.className = 'fmt-btn' + (block.fontStyle === 'italic' ? ' active' : '');
+  btnItalic.innerHTML = '<i>I</i>';
+  btnItalic.title = 'İtalik';
+  btnItalic.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); });
+  btnItalic.addEventListener('click', e => {
+    e.stopPropagation();
+    block.fontStyle = block.fontStyle === 'italic' ? '' : 'italic';
+    el.style.fontStyle = block.fontStyle;
+    btnItalic.classList.toggle('active', block.fontStyle === 'italic');
+    scheduleSave();
+  });
+
+  // Separator
+  const sep1 = document.createElement('span');
+  sep1.className = 'fmt-sep';
+
+  // Align buttons
+  const alignOptions = [
+    { val: 'left',    icon: '⬅', title: 'Sola Hizala' },
+    { val: 'center',  icon: '↔', title: 'Ortala' },
+    { val: 'right',   icon: '➡', title: 'Sağa Hizala' },
+  ];
+  const alignBtns = {};
+  alignOptions.forEach(a => {
+    const btn = document.createElement('button');
+    btn.className = 'fmt-btn' + (block.textAlign === a.val ? ' active' : '');
+    btn.textContent = a.icon;
+    btn.title = a.title;
+    btn.addEventListener('mousedown', e => { e.preventDefault(); e.stopPropagation(); });
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      if (block.textAlign === a.val) {
+        block.textAlign = '';
+        el.style.textAlign = '';
+      } else {
+        block.textAlign = a.val;
+        el.style.textAlign = a.val;
+      }
+      Object.values(alignBtns).forEach(b => b.classList.remove('active'));
+      if (block.textAlign) btn.classList.add('active');
+      scheduleSave();
+    });
+    alignBtns[a.val] = btn;
+  });
+
+  // Separator
+  const sep2 = document.createElement('span');
+  sep2.className = 'fmt-sep';
+
+  // Line height select
+  const lineHSelect = document.createElement('select');
+  lineHSelect.className = 'fmt-size-select';
+  lineHSelect.title = 'Satır Aralığı';
+  lineHSelect.style.minWidth = '48px';
+  const lineHeights = [
+    { val: '1.2', label: '1.2×' },
+    { val: '1.4', label: '1.4×' },
+    { val: '1.6', label: '1.6×' },
+    { val: '1.8', label: '1.8×' },
+    { val: '2.0', label: '2.0×' },
+    { val: '2.4', label: '2.4×' },
+  ];
+  const currentLH = block.lineHeight || '1.6';
+  lineHeights.forEach(lh => {
+    const opt = document.createElement('option');
+    opt.value = lh.val;
+    opt.textContent = lh.label;
+    if (lh.val === currentLH) opt.selected = true;
+    lineHSelect.appendChild(opt);
+  });
+  lineHSelect.addEventListener('mousedown', e => e.stopPropagation());
+  lineHSelect.addEventListener('change', () => {
+    block.lineHeight = lineHSelect.value;
+    el.style.lineHeight = block.lineHeight;
+    scheduleSave();
+  });
+  if (block.lineHeight) el.style.lineHeight = block.lineHeight;
+
+  // Assemble toolbar
+  toolbar.appendChild(sizeSelect);
+  toolbar.appendChild(sep1);
+  toolbar.appendChild(btnBold);
+  toolbar.appendChild(btnItalic);
+  toolbar.appendChild(document.createRange().createContextualFragment(
+    '<span class="fmt-sep"></span>'
+  ));
+  Object.values(alignBtns).forEach(b => toolbar.appendChild(b));
+  toolbar.appendChild(sep2);
+  toolbar.appendChild(lineHSelect);
 
   wrap.appendChild(controls);
+  wrap.appendChild(toolbar);
   wrap.appendChild(el);
   return wrap;
+}
+
+function getDefaultFontSize(type) {
+  const map = { h1: 32, h2: 26, h3: 20, p: 16, ul: 16, todo: 16 };
+  return map[type] || 16;
 }
 
 function insertNewBlockAfter(currentId, newType = 'p') {
