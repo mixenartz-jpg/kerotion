@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kerotion — Workspace</title>
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
 
   <!-- ========== SIDEBAR ========== -->
@@ -18,7 +20,7 @@
 
     <div class="sidebar-scrollable">
       <div class="sidebar-accordion">
-        
+
         <!-- GENEL / ANA -->
         <details class="sidebar-group" open>
           <summary class="sidebar-group-header">🏠 ANA MERKEZ</summary>
@@ -80,7 +82,7 @@
         </div>
         <div class="pomo-display" id="pomoTimeDisplay">25:00</div>
         <div class="pomo-status" id="pomoStatusText">Durum: Bekliyor</div>
-        
+
         <div class="pomo-controls">
           <button class="pomo-btn play" id="pomoPlayPause">▶</button>
           <button class="pomo-btn reset" id="pomoReset">↺</button>
@@ -118,7 +120,7 @@
 
   <!-- ========== ANA EDITOR ========== -->
   <main class="editor-wrapper" id="editorWrapper">
-    
+
     <!-- PAGES VIEW (Mevcut Editör) -->
     <div class="editor-container view-active" id="pageView">
       <!-- Sayfa Üst Bilgisi -->
@@ -138,33 +140,36 @@
         <h1 class="page-title">Günlük</h1>
         <p class="view-subtitle">Geçmiş düşüncelerin, hedeflerin ve değerlendirmelerin.</p>
       </header>
-      
+
       <div class="journal-controls">
         <button id="btnNewJournalDay" class="btn-glow">Bugün İçin Yeni Kayıt</button>
       </div>
-      
+
       <div id="journalList" class="journal-list">
         <!-- JS Dolduracak (Geçmiş günler) -->
       </div>
-      
+
       <div id="journalEditor" class="journal-editor view-hidden">
         <button id="btnBackToJournalList" class="btn-back">← Geri Dön</button>
         <h2 id="journalCurrentDate" class="journal-date"></h2>
-        
-        <textarea id="journalNotes" class="journal-textarea" placeholder="Bugün neler hissettin, neler yaşadın? İçini dök..."></textarea>
-        
+
+        <textarea id="journalNotes" class="journal-textarea"
+          placeholder="Bugün neler hissettin, neler yaşadın? İçini dök..."></textarea>
+
         <div class="journal-evaluation">
           <h3>Günün Değerlendirmesi</h3>
           <div class="eval-group">
             <label>Bugün ne öğrendim?</label>
-            <textarea id="journalLearned" class="journal-eval-input" rows="2" placeholder="Basit ama kritik bir bilgi..."></textarea>
+            <textarea id="journalLearned" class="journal-eval-input" rows="2"
+              placeholder="Basit ama kritik bir bilgi..."></textarea>
           </div>
           <div class="eval-group">
             <label>Neyi daha iyi yapabilirdim?</label>
-            <textarea id="journalBetter" class="journal-eval-input" rows="2" placeholder="Yarınki gelişim noktam..."></textarea>
+            <textarea id="journalBetter" class="journal-eval-input" rows="2"
+              placeholder="Yarınki gelişim noktam..."></textarea>
           </div>
         </div>
-        
+
         <button id="btnSaveJournal" class="btn-glow success">Kaydet</button>
       </div>
     </div>
@@ -175,12 +180,12 @@
         <h1 class="page-title">Disiplin & Rutinler</h1>
         <p class="view-subtitle">Zinciri kırma. İstikrar, yetenekten üstündür.</p>
       </header>
-      
+
       <div class="routines-controls">
-         <input type="text" id="newRoutineInput" placeholder="Yeni rutin ekle (Örn: Fitness)" />
-         <button id="btnAddRoutine" class="btn-glow action">Ekle</button>
+        <input type="text" id="newRoutineInput" placeholder="Yeni rutin ekle (Örn: Fitness)" />
+        <button id="btnAddRoutine" class="btn-glow action">Ekle</button>
       </div>
-      
+
       <div class="routines-table-wrapper" id="routinesTableWrapper">
         <!-- JS Dolduracak (Tablo grid) -->
       </div>
@@ -275,7 +280,7 @@
             <button id="btnMistakeAdd" class="btn-glow action">Logla</button>
           </div>
         </div>
-        
+
         <div class="mistake-table-wrapper">
           <table class="mistake-table">
             <thead>
@@ -360,11 +365,13 @@
   <div class="braindump-modal hidden" id="brainDumpModal">
     <div class="braindump-container">
       <span class="bd-icon">💡</span>
-      <input type="text" id="brainDumpInput" placeholder="Aklına geleni hemen yaz ve Enter'a bas..." autocomplete="off"/>
+      <input type="text" id="brainDumpInput" placeholder="Aklına geleni hemen yaz ve Enter'a bas..."
+        autocomplete="off" />
       <div class="bd-hint">Vazgeçmek için ESC</div>
     </div>
   </div>
 
   <script src="app.js"></script>
 </body>
+
 </html>
