@@ -365,15 +365,79 @@
 
   <!-- ========== BLOCK CONTEXT MENU ========== -->
   <div class="block-context-menu" id="blockContextMenu" style="display: none;">
-    <div class="context-colors">
-      <div class="color-badge" data-color="#f4f4f5" style="background: #f4f4f5;" title="Varsayılan"></div>
-      <div class="color-badge" data-color="#8b5cf6" style="background: #8b5cf6;" title="Mor"></div>
-      <div class="color-badge" data-color="#06b6d4" style="background: #06b6d4;" title="Camgöbeği"></div>
-      <div class="color-badge" data-color="#22c55e" style="background: #22c55e;" title="Yeşil"></div>
-      <div class="color-badge" data-color="#f59e0b" style="background: #f59e0b;" title="Turuncu"></div>
-      <div class="color-badge" data-color="#f43f5e" style="background: #f43f5e;" title="Kırmızı"></div>
+
+    <!-- BÖLÜM: DÖNÜŞTÜR -->
+    <div class="ctx-section-label">Dönüştür</div>
+    <div class="ctx-turn-into-grid">
+      <button class="ctx-turn-btn" data-type="p">
+        <span class="ctx-turn-icon">¶</span>
+        <span>Metin</span>
+      </button>
+      <button class="ctx-turn-btn" data-type="h1">
+        <span class="ctx-turn-icon">H1</span>
+        <span>Başlık 1</span>
+      </button>
+      <button class="ctx-turn-btn" data-type="h2">
+        <span class="ctx-turn-icon">H2</span>
+        <span>Başlık 2</span>
+      </button>
+      <button class="ctx-turn-btn" data-type="h3">
+        <span class="ctx-turn-icon">H3</span>
+        <span>Başlık 3</span>
+      </button>
+      <button class="ctx-turn-btn" data-type="ul">
+        <span class="ctx-turn-icon">•</span>
+        <span>Liste</span>
+      </button>
+      <button class="ctx-turn-btn" data-type="todo">
+        <span class="ctx-turn-icon">☑</span>
+        <span>Görev</span>
+      </button>
     </div>
-    <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 6px 0;"></div>
+
+    <div class="ctx-divider"></div>
+
+    <!-- BÖLÜM: YAZI BOYUTU -->
+    <div class="ctx-section-label">Yazı Boyutu</div>
+    <div class="ctx-font-size-row">
+      <button class="ctx-size-btn" data-size="12">12</button>
+      <button class="ctx-size-btn" data-size="14">14</button>
+      <button class="ctx-size-btn" data-size="16">16</button>
+      <button class="ctx-size-btn" data-size="18">18</button>
+      <button class="ctx-size-btn" data-size="20">20</button>
+      <button class="ctx-size-btn" data-size="24">24</button>
+      <button class="ctx-size-btn" data-size="28">28</button>
+      <button class="ctx-size-btn" data-size="32">32</button>
+      <button class="ctx-size-btn" data-size="40">40</button>
+    </div>
+
+    <div class="ctx-divider"></div>
+
+    <!-- BÖLÜM: FORMAT -->
+    <div class="ctx-section-label">Format</div>
+    <div class="ctx-format-row">
+      <button class="ctx-fmt-btn" id="ctxBtnBold" title="Kalın"><b>B</b></button>
+      <button class="ctx-fmt-btn" id="ctxBtnItalic" title="İtalik"><i>I</i></button>
+      <div class="ctx-fmt-sep"></div>
+      <button class="ctx-fmt-btn" id="ctxBtnAlignLeft"  title="Sola">⬅</button>
+      <button class="ctx-fmt-btn" id="ctxBtnAlignCenter" title="Ortala">↔</button>
+      <button class="ctx-fmt-btn" id="ctxBtnAlignRight"  title="Sağa">➡</button>
+    </div>
+
+    <div class="ctx-divider"></div>
+
+    <!-- BÖLÜM: RENK -->
+    <div class="ctx-section-label">Yazı Rengi</div>
+    <div class="context-colors">
+      <div class="color-badge" data-color="#f4f4f5" style="background:#f4f4f5" title="Varsayılan"></div>
+      <div class="color-badge" data-color="#8b5cf6" style="background:#8b5cf6" title="Mor"></div>
+      <div class="color-badge" data-color="#06b6d4" style="background:#06b6d4" title="Camgöbeği"></div>
+      <div class="color-badge" data-color="#22c55e" style="background:#22c55e" title="Yeşil"></div>
+      <div class="color-badge" data-color="#f59e0b" style="background:#f59e0b" title="Turuncu"></div>
+      <div class="color-badge" data-color="#f43f5e" style="background:#f43f5e" title="Kırmızı"></div>
+    </div>
+
+    <div class="ctx-divider"></div>
     <button class="context-btn danger" id="btnDeleteBlock">🗑️ Sil</button>
   </div>
 
