@@ -218,6 +218,29 @@ function toggleSidebar() {
 /* ──────────────────────────────────────────────────────────────
    7. SAYFA AGACI
    ────────────────────────────────────────────────────────────── */
+function deletePage(pageId) {
+  function collectIds(id) {
+    const ids = [id];
+    DB.state.pages.filter(p => p.parentId === id).forEach(child => {
+      collectIds(child.id).forEach(cid => ids.push(cid));
+    });
+    return ids;
+  }
+  const toDelete = collectIds(pageId);
+  DB.state.pages = DB.state.pages.filter(p => !toDelete.includes(p.id));
+
+  if (toDelete.includes(activePageId)) {
+    activePageId = DB.state.pages.length > 0 ? DB.state.pages[0].id : null;
+    if (activePageId) openPage(activePageId);
+    else {
+      DOM.pageTitle.value = '';
+      DOM.blocksContainer.innerHTML = '';
+    }
+  }
+  scheduleSave();
+  renderTree();
+}
+
 function createPage(parentId = null) {
   const page = {
     id: generateId(), title: '', parentId, isOpen: true,
@@ -277,10 +300,20 @@ function renderTree(parentId = null, container = DOM.pageTree) {
     addSub.title = 'Alt sayfa ekle';
     addSub.addEventListener('click', () => createPage(page.id));
 
+    const delBtn = document.createElement('button');
+    delBtn.className = 'tree-delete-btn';
+    delBtn.innerHTML = '🗑';
+    delBtn.title = 'Sayfayı sil';
+    delBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      deletePage(page.id);
+    });
+
     content.appendChild(toggle);
     content.appendChild(icon);
     content.appendChild(title);
     content.appendChild(addSub);
+    content.appendChild(delBtn);
     node.appendChild(content);
 
     if (hasChildren) {
